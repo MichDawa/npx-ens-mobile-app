@@ -1,42 +1,26 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import styles from './styles';
 
 const LoginPage = () => {
-  const handleLogin = () => {
-    console.log('Login pressed');
-  };
+  const router = useRouter();
 
-  const handleSignUp = () => {
-    console.log('SignUp pressed');
+  const nextPage = () => {
+    router.push('/');
+    console.log('next page pressed');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        <Text style={styles.eLetter}>E</Text>
-        <Text style={styles.nLetter}>N</Text>
-        <Text style={styles.sLetter}>S</Text>
-      </Text>
-      <Text style={styles.subtitle}>Mobile Service</Text>
-      
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
-          style={styles.button} 
-          onPress={handleLogin}
-        >
-          <Text style={styles.buttonText}>
-            <Text style={styles.loginColor}>Login using mobile number</Text>
-            </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
           style={[styles.button, styles.signUpButton]} 
-          onPress={handleSignUp}
+          onPress={nextPage}
         >
           <Text style={styles.buttonText}>
-            <Text style={styles.SignUpColor}>Sign Up</Text>
-            </Text>
+            <Text style={styles.SignUpColor}>Next</Text>
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

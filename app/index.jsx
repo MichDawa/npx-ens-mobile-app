@@ -1,28 +1,58 @@
-import LoginPage from './login';
-import React, { useState } from 'react';
-import { Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
-import AppLoading from 'expo-app-loading';
+import HomePage from './homescreen/index';
 
-const getFonts = () =>
-  Font.loadAsync({
+const StackNavigator = () => (
+  <Stack>
+    <Stack.Screen 
+      name="homescreen/index"
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen 
+      name="login/index"
+      options={{ headerShown: false }}
+    />
+  </Stack>
+);
+
+const loadFonts = async () => {
+  await Font.loadAsync({
     'AbrilFatface-Regular': require('../assets/fonts/AbrilFatface-Regular.ttf'),
     'Poppins-Regular': require('../assets/fonts/Poppins-Regular.ttf'),
     'Poppins-Bold': require('../assets/fonts/Poppins-Bold.ttf'),
   });
+};
 
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [appReady, setAppReady] = useState(false);
 
-  if (!fontsLoaded) {
-    return (
-      <AppLoading 
-        startAsync={getFonts} 
-        onFinish={() => setFontsLoaded(true)}
-        onError={(error) => console.error('Error loading fonts:', error)}
-      />
-    );
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await SplashScreen.preventAutoHideAsync();
+        await loadFonts();
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setAppReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  useEffect(() => {
+    if (appReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [appReady]);
+
+  if (!appReady) {
+    return null;
   }
 
-  return <LoginPage />;
+  return <HomePage />;
 }
