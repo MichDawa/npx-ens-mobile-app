@@ -3,10 +3,21 @@ import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { useRouter } from "expo-router";
 import styles from "./styles";
 
-const LoginPage = () => {
+const SignUpPage = () => {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("+63 ");
+  const [username, setUsername] = useState("");
   const [isPressed, setIsPressed] = useState(false);
+
+  const nextPage = () => {
+    router.push("/");
+    console.log("signup page pressed");
+  };
+
+  const login = () => {
+    router.push("/login");
+    console.log("login page pressed");
+  };
 
   const handlePhoneNumberChange = (newValue) => {
     if (!newValue.startsWith("+63 ")) return;
@@ -17,19 +28,10 @@ const LoginPage = () => {
     }
   };
 
-  const nextPage = () => {
-    router.push("/");
-    console.log("next page pressed");
-  };
-
-  const signUp = () => {
-    router.push("/sign-up");
-    console.log("sign up page pressed");
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+
+      <Text style={styles.title}>Sign Up</Text>
 
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>Number</Text>
@@ -42,28 +44,38 @@ const LoginPage = () => {
         />
       </View>
 
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>Username</Text>
+        <TextInput
+          style={styles.inputField}
+          value={username}
+          onChangeText={setUsername}
+          keyboardType="default"
+          placeholder="example@123"
+          placeholderTextColor="#888"
+        />
+      </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={nextPage}>
           <Text style={styles.buttonText}>
-            <Text style={styles.nextColor}>Next</Text>
+            <Text style={styles.nextColor}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </View>
-
       <TouchableOpacity
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
-        onPress={signUp}
+        onPress={login}
       >
         <Text style={[
           styles.signUpSubtitle,
           isPressed && styles.signUpSubtitlePressed
         ]}>
-          Don't have an account?{"\n"}Sign up here
+          Already registered?{"\n"}Log in here
         </Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

@@ -15,6 +15,10 @@ const StackNavigator = () => (
       name="login/index"
       options={{ headerShown: false }}
     />
+    <Stack.Screen 
+      name="sign-up/index"
+      options={{ headerShown: false }}
+    />
   </Stack>
 );
 
