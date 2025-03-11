@@ -38,34 +38,7 @@ export default StyleSheet.create({
     marginVertical: 20,
     width: 300,
   },
-  inputLabel: {
-    position: 'absolute',
-    top: -10,
-    left: 15,
-    backgroundColor: '#F5FCFF',
-    paddingHorizontal: 5,
-    fontSize: 12,
-    color: '#004AAD',
-    fontFamily: 'Poppins-Regular',
-    zIndex: 1,
-  },
-  inputField: {
-    borderWidth: 2,
-    borderColor: '#004AAD',
-    borderRadius: 15,
-    padding: 15,
-    fontSize: 16,
-    fontFamily: 'Poppins-Regular',
-  },
-  loginSubtitle: {
-    marginTop: 20,
-    fontSize: 12,
-    color: '#004AAD',
-    fontFamily: 'Poppins-Regular',
-    textAlign: 'center',
-    alignSelf: 'center',
-  },
-  loginSubtitlePressed: {
+  signUpSubtitlePressed: {
     color: '#003077',
   },
 });

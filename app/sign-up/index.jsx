@@ -30,7 +30,6 @@ const SignUpPage = () => {
 
   return (
     <View style={styles.container}>
-
       <Text style={styles.title}>Sign Up</Text>
 
       <View style={styles.inputContainer}>
@@ -55,6 +54,7 @@ const SignUpPage = () => {
           placeholderTextColor="#888"
         />
       </View>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={nextPage}>
           <Text style={styles.buttonText}>
@@ -62,18 +62,20 @@ const SignUpPage = () => {
           </Text>
         </TouchableOpacity>
       </View>
+
       <TouchableOpacity
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
         onPress={login}
       >
         <Text style={[
-          styles.signUpSubtitle,
-          isPressed && styles.signUpSubtitlePressed
+          styles.loginSubtitle,
+          isPressed && styles.loginSubtitlePressed
         ]}>
           Already registered?{"\n"}Log in here
         </Text>
       </TouchableOpacity>
+
     </View>
   );
 };

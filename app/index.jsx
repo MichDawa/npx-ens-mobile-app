@@ -19,6 +19,10 @@ const StackNavigator = () => (
       name="sign-up/index"
       options={{ headerShown: false }}
     />
+    <Stack.Screen 
+      name="otp/index"
+      options={{ headerShown: false }}
+    />
   </Stack>
 );
 

@@ -12,6 +12,7 @@ const HomePage = () => {
   };
 
   const handleSignUp = () => {
+    router.push('/sign-up');
     console.log('SignUp pressed');
   };
 
