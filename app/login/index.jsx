@@ -18,7 +18,7 @@ const LoginPage = () => {
   };
 
   const nextPage = () => {
-    router.push("/");
+    router.push("/otp");
     console.log("next page pressed");
   };
 

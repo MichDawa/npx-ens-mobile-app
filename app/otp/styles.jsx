@@ -38,7 +38,65 @@ export default StyleSheet.create({
     marginVertical: 20,
     width: 300,
   },
-  signUpSubtitlePressed: {
+  otp: {
+    marginTop: 20,
+    fontSize: 12,
+    color: '#004AAD',
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'center',
+    alignSelf: 'center',
+  },
+  otpPressed: {
     color: '#003077',
+  },
+  timer: {
+    fontSize: 12,
+    color: '#004AAD',
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'center',
+    alignSelf: 'center',
+  },
+  resetPressed: {
+    color: '#003077',
+  },
+  otpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 10,
+  },
+  otpInput: {
+    width: 35,
+    borderWidth: 1,
+    borderColor: '#004AAD',
+    borderRadius: 5,
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'Poppins-Bold',
+    color: '#004AAD',
+  },
+  timerContainer: {
+    alignItems: 'center',
+    marginBottom: 60,
+
+  },
+  timerText: {
+    fontSize: 12,
+    color: '#004AAD',
+    fontFamily: 'Poppins-Regular',
+  },
+  resendText: {
+    fontSize: 12,
+    color: '#004AAD',
+    fontFamily: 'Poppins-Bold',
+    marginTop: 5,
+    textDecorationLine: 'underline',
+    marginBottom: 30,
+  },
+  resendCooldown: {
+    fontSize: 12,
+    color: '#666',
+    fontFamily: 'Poppins-Regular',
+    marginTop: 5,
   },
 });
