@@ -1,32 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import { useRouter } from "expo-router";
+import { useSignUpNavigation } from "../../store/state/sign-up-state";
 import styles from "./styles";
 
 const SignUpPage = () => {
-  const router = useRouter();
-  const [phoneNumber, setPhoneNumber] = useState("+63 ");
-  const [username, setUsername] = useState("");
-  const [isPressed, setIsPressed] = useState(false);
-
-  const nextPage = () => {
-    router.push("/");
-    console.log("signup page pressed");
-  };
-
-  const login = () => {
-    router.push("/login");
-    console.log("login page pressed");
-  };
-
-  const handlePhoneNumberChange = (newValue) => {
-    if (!newValue.startsWith("+63 ")) return;
-    
-    const numbers = newValue.slice(4).replace(/[^0-9]/g, "");
-    if (numbers.length <= 10) {
-      setPhoneNumber(`+63 ${numbers}`);
-    }
-  };
+  const {
+    phoneNumber,
+    username,
+    isPressed,
+    setUsername,
+    handlePhoneNumberChange,
+    handlePressState,
+    navigateTo
+  } = useSignUpNavigation();
 
   return (
     <View style={styles.container}>
@@ -56,7 +42,10 @@ const SignUpPage = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={nextPage}>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => navigateTo('/')}
+        >
           <Text style={styles.buttonText}>
             <Text style={styles.nextColor}>Sign Up</Text>
           </Text>
@@ -64,9 +53,9 @@ const SignUpPage = () => {
       </View>
 
       <TouchableOpacity
-        onPressIn={() => setIsPressed(true)}
-        onPressOut={() => setIsPressed(false)}
-        onPress={login}
+        onPressIn={() => handlePressState(true)}
+        onPressOut={() => handlePressState(false)}
+        onPress={() => navigateTo('/login')}
       >
         <Text style={[
           styles.loginSubtitle,
@@ -75,7 +64,6 @@ const SignUpPage = () => {
           Already registered?{"\n"}Log in here
         </Text>
       </TouchableOpacity>
-
     </View>
   );
 };

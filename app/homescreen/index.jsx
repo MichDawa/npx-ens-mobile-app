@@ -1,20 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 import styles from './styles';
+import { useHomeNavigation } from '../../store/state/homescreen-state';
 
 const HomePage = () => {
-  const router = useRouter();
-
-  const handleLogin = () => {
-    router.push('/login');
-    console.log('SignUp pressed');
-  };
-
-  const handleSignUp = () => {
-    router.push('/sign-up');
-    console.log('SignUp pressed');
-  };
+  const {
+    navigateTo
+  } = useHomeNavigation();
 
   return (
     <View style={styles.container}>
@@ -28,7 +20,7 @@ const HomePage = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
           style={styles.button} 
-          onPress={handleLogin}
+          onPress={() => navigateTo('/login')}
         >
           <Text style={styles.buttonText}>
             <Text style={styles.loginColor}>Login using mobile number</Text>
@@ -37,7 +29,7 @@ const HomePage = () => {
 
         <TouchableOpacity 
           style={[styles.button, styles.signUpButton]} 
-          onPress={handleSignUp}
+          onPress={() => navigateTo('/sign-up')}
         >
           <Text style={styles.buttonText}>
             <Text style={styles.SignUpColor}>Sign Up</Text>

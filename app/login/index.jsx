@@ -1,31 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import { useRouter } from "expo-router";
 import styles from "./styles";
+import { useLoginNavigation } from "../../store/state/login-state";
 
 const LoginPage = () => {
-  const router = useRouter();
-  const [phoneNumber, setPhoneNumber] = useState("+63 ");
-  const [isPressed, setIsPressed] = useState(false);
-
-  const handlePhoneNumberChange = (newValue) => {
-    if (!newValue.startsWith("+63 ")) return;
-    
-    const numbers = newValue.slice(4).replace(/[^0-9]/g, "");
-    if (numbers.length <= 10) {
-      setPhoneNumber(`+63 ${numbers}`);
-    }
-  };
-
-  const nextPage = () => {
-    router.push("/otp");
-    console.log("next page pressed");
-  };
-
-  const signUp = () => {
-    router.push("/sign-up");
-    console.log("sign up page pressed");
-  };
+  const {
+    phoneNumber,
+    isPressed,
+    handlePhoneNumberChange,
+    handlePressState,
+    navigateTo
+  } = useLoginNavigation();
 
   return (
     <View style={styles.container}>
@@ -43,7 +28,10 @@ const LoginPage = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={nextPage}>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => navigateTo('/otp')}
+        >
           <Text style={styles.buttonText}>
             <Text style={styles.nextColor}>Next</Text>
           </Text>
@@ -51,9 +39,9 @@ const LoginPage = () => {
       </View>
 
       <TouchableOpacity
-        onPressIn={() => setIsPressed(true)}
-        onPressOut={() => setIsPressed(false)}
-        onPress={signUp}
+        onPressIn={() => handlePressState(true)}
+        onPressOut={() => handlePressState(false)}
+        onPress={() => navigateTo('/sign-up')}
       >
         <Text style={[
           styles.signUpSubtitle,
@@ -62,7 +50,6 @@ const LoginPage = () => {
           Don't have an account?{"\n"}Sign up here
         </Text>
       </TouchableOpacity>
-
     </View>
   );
 };

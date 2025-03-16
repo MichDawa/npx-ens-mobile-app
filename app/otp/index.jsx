@@ -1,68 +1,21 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import { useRouter } from "expo-router";
+import { useOtpNavigation } from "../../store/state/otp-state";
 import styles from "./styles";
 
-const otpPage = () => {
-  const router = useRouter();
-  const [isPressed, setIsPressed] = useState(false);
-  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
-  const [expiryTime, setExpiryTime] = useState(300);
-  const [resendTime, setResendTime] = useState(5);
-  const [showResend, setShowResend] = useState(false);
-  
-  const otpInputs = Array(6).fill().map(() => useRef(null));
-
-  useEffect(() => {
-    if (expiryTime > 0) {
-      const timer = setInterval(() => {
-        setExpiryTime(prev => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [expiryTime]);
-
-  useEffect(() => {
-    if (resendTime > 0) {
-      const timer = setInterval(() => {
-        setResendTime(prev => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    } else {
-      setShowResend(true);
-    }
-  }, [resendTime]);
-
-  const handleOtpChange = (index, value) => {
-    const newOtp = [...otpDigits];
-    newOtp[index] = value;
-    setOtpDigits(newOtp);
-
-    if (value && index < 5) {
-      otpInputs[index + 1].current.focus();
-    }
-
-    if (!value && index > 0) {
-      otpInputs[index - 1].current.focus();
-    }
-  };
-
-  const handleResend = () => {
-    setExpiryTime(300);
-    setResendTime(5);
-    setShowResend(false);
-    setOtpDigits(['', '', '', '', '', '']);
-    otpInputs[0].current.focus();
-  };
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const nextPage = () => router.push("/");
-  const signUp = () => router.push("/sign-up");
+const OtpPage = () => {
+  const {
+    isPressed,
+    otpDigits,
+    expiryTime,
+    showResend,
+    otpInputs,
+    handleOtpChange,
+    handleResend,
+    handlePressState,
+    navigateTo,
+    formatTime
+  } = useOtpNavigation();
 
   return (
     <View style={styles.container}>
@@ -94,7 +47,10 @@ const otpPage = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={nextPage}>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => navigateTo('/')}
+        >
           <Text style={styles.buttonText}>
             <Text style={styles.nextColor}>Next</Text>
           </Text>
@@ -102,9 +58,9 @@ const otpPage = () => {
       </View>
 
       <TouchableOpacity
-        onPressIn={() => setIsPressed(true)}
-        onPressOut={() => setIsPressed(false)}
-        onPress={signUp}
+        onPressIn={() => handlePressState(true)}
+        onPressOut={() => handlePressState(false)}
+        onPress={() => navigateTo('/sign-up')}
       >
         <Text style={[styles.otp, isPressed && styles.otpPressed]}>
           Don't have an account?{"\n"}Sign up here
@@ -114,4 +70,4 @@ const otpPage = () => {
   );
 };
 
-export default otpPage;
+export default OtpPage;
