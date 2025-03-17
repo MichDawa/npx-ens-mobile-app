@@ -44,7 +44,7 @@ const SignUpPage = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => navigateTo('/')}
+          onPress={() => navigateTo('/maps-location')}
         >
           <Text style={styles.buttonText}>
             <Text style={styles.nextColor}>Sign Up</Text>
