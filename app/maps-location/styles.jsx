@@ -3,12 +3,15 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centeredContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   map: {
+    flex: 1,
     width: '100%',
-    height: '100%',
   },
   errorText: {
     fontSize: 16,

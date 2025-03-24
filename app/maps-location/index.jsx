@@ -9,13 +9,14 @@ import closedRoads from '../../assets/closed-roads';
 import LocationIcon from '../../assets/icons/location-icon';
 import LandmarkIcon from '../../assets/icons/landmark-icon';
 import ClosedRoadIcon from '../../assets/icons/closed-road-icon';
+import Header from '../components/header';
 
 const MapLocation = () => {
   const { location, errorMsg } = useMapsLocationState();
 
   if (errorMsg) {
     return (
-      <View style={styles.container}>
+      <View style={styles.centeredContainer}>
         <Text style={styles.errorText}>{errorMsg}</Text>
       </View>
     );
@@ -23,7 +24,7 @@ const MapLocation = () => {
 
   if (!location) {
     return (
-      <View style={styles.container}>
+      <View style={styles.centeredContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
         <Text style={styles.loadingText}>Getting your location...</Text>
       </View>
@@ -32,6 +33,7 @@ const MapLocation = () => {
 
   return (
     <View style={styles.container}>
+      <Header />
       <MapView
         style={styles.map}
         provider={Platform.OS === 'android' ? 'google' : undefined}
@@ -69,7 +71,7 @@ const MapLocation = () => {
             description={center.description}
             anchor={{ x: 0.5, y: 1 }}
           >
-            <LandmarkIcon width={65} height={65} />
+            <LandmarkIcon width={50} height={50} />
           </Marker>
         ))}
 
@@ -81,7 +83,7 @@ const MapLocation = () => {
             description={center.description}
             anchor={{ x: 0.5, y: 1 }}
           >
-            <ClosedRoadIcon width={65} height={65} />
+            <ClosedRoadIcon width={50} height={50} />
           </Marker>
         ))}
       </MapView>
