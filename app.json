@@ -15,8 +15,16 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "${ANDROID_GOOGLE_MAPS_API_KEY}"
+          "apiKey": "${MAPS_API_KEY}"
         }
+      }
+    },
+    "ios": {
+      "config": {
+        "googleMapsApiKey": "${MAPS_API_KEY}"
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Allow ENS Mobile App to access your location while you are using the app."
       }
     },
     "web": {

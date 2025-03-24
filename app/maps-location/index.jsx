@@ -1,29 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import React from 'react';
+import { View, Platform, ActivityIndicator, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
 import styles from './styles';
+import useMapsLocationState from '../../store/state/maps-location-state';
+import mapStyle from '../../assets/map-styles';
+import evacuationCenters from '../../assets/evacuation-centers';
 
 const MapLocation = () => {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      // Request location permissions
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      // Get current location
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-      setLocation(location);
-    })();
-  }, []);
+  const { location, errorMsg } = useMapsLocationState();
 
   if (errorMsg) {
     return (
@@ -46,7 +30,8 @@ const MapLocation = () => {
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        provider="google"
+        provider={Platform.OS === 'android' ? 'google' : undefined}
+        customMapStyle={mapStyle}
         initialRegion={{
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
@@ -55,6 +40,9 @@ const MapLocation = () => {
         }}
         showsUserLocation={true}
         showsMyLocationButton={true}
+        showsPointsOfInterest={false}
+        showsBuildings={false}
+        showsIndoors={false}
       >
         <Marker
           coordinate={{
@@ -65,6 +53,16 @@ const MapLocation = () => {
           description="You are here"
           pinColor="#2196F3"
         />
+
+        {evacuationCenters.map((center) => (
+          <Marker
+            key={center.id}
+            coordinate={center.coordinate}
+            title={center.title}
+            description={center.description}
+            pinColor="#FF0000"
+          />
+        ))}
       </MapView>
     </View>
   );
