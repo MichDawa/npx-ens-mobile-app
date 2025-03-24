@@ -8,6 +8,11 @@ const mapStyle = Platform.select({
       "stylers": [{ "visibility": "off" }]
     },
     {
+      "featureType": "poi.attraction",
+      "elementType": "all",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
       "featureType": "road",
       "elementType": "all",
       "stylers": [{ "visibility": "on" }]

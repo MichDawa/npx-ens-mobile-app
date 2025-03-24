@@ -5,6 +5,10 @@ import styles from './styles';
 import useMapsLocationState from '../../store/state/maps-location-state';
 import mapStyle from '../../assets/map-styles';
 import evacuationCenters from '../../assets/evacuation-centers';
+import closedRoads from '../../assets/closed-roads';
+import LocationIcon from '../../assets/icons/location-icon';
+import LandmarkIcon from '../../assets/icons/landmark-icon';
+import ClosedRoadIcon from '../../assets/icons/closed-road-icon';
 
 const MapLocation = () => {
   const { location, errorMsg } = useMapsLocationState();
@@ -38,7 +42,8 @@ const MapLocation = () => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
-        showsUserLocation={true}
+        mapType="hybrid" //note to have this be disabled to toggle satellite and default map
+        showsUserLocation={false}
         showsMyLocationButton={true}
         showsPointsOfInterest={false}
         showsBuildings={false}
@@ -51,8 +56,10 @@ const MapLocation = () => {
           }}
           title="Your Location"
           description="You are here"
-          pinColor="#2196F3"
-        />
+          anchor={{ x: 0.5, y: 1 }}
+        >
+          <LocationIcon width={48} height={59} />
+        </Marker>
 
         {evacuationCenters.map((center) => (
           <Marker
@@ -60,8 +67,22 @@ const MapLocation = () => {
             coordinate={center.coordinate}
             title={center.title}
             description={center.description}
-            pinColor="#FF0000"
-          />
+            anchor={{ x: 0.5, y: 1 }}
+          >
+            <LandmarkIcon width={65} height={65} />
+          </Marker>
+        ))}
+
+        {closedRoads.map((center) => (
+          <Marker
+            key={center.id}
+            coordinate={center.coordinate}
+            title={center.title}
+            description={center.description}
+            anchor={{ x: 0.5, y: 1 }}
+          >
+            <ClosedRoadIcon width={65} height={65} />
+          </Marker>
         ))}
       </MapView>
     </View>
