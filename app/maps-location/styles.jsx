@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 
 export default StyleSheet.create({
   container: {
@@ -23,5 +24,12 @@ export default StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#333',
+  },
+  pingContainer: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    zIndex: 1,
+    elevation: Platform.OS === 'android' ? 50 : 0,
   },
 });

@@ -35,6 +35,8 @@ const loadFonts = async () => {
     'AbrilFatface-Regular': require('../assets/fonts/AbrilFatface-Regular.ttf'),
     'Poppins-Regular': require('../assets/fonts/Poppins-Regular.ttf'),
     'Poppins-Bold': require('../assets/fonts/Poppins-Bold.ttf'),
+    'SF-Pro-Display-Regular': require('../assets/fonts/SF-Pro-Display-Regular.otf'),
+    'SF-Pro-Display-Bold': require('../assets/fonts/SF-Pro-Display-Bold.otf'),
   });
 };
 
