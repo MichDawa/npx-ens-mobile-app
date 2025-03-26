@@ -1,6 +1,6 @@
 // react
-import React from 'react';
-import { View, Platform, ActivityIndicator, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, Platform, ActivityIndicator, Text, TouchableOpacity, Dimensions, Pressable, TouchableWithoutFeedback } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 // styles and assets
@@ -20,10 +20,15 @@ import useMapsLocationState from '../../store/state/maps-location-state';
 
 // others
 import Header from '../components/header/index';
-
+import MapPingDialog from '../components/ping/index';
+import MapLegendDialog from '../components/map-legend-dialog';
 
 const MapLocation = () => {
   const { location, errorMsg } = useMapsLocationState();
+  const [pingConfirm, setPingConfirm] = useState(false);
+  const [showLegend, setShowLegend] = useState(false);
+  
+  const { width, height } = Dimensions.get('window');
 
   if (errorMsg) {
     return (
@@ -44,7 +49,11 @@ const MapLocation = () => {
 
   return (
     <View style={styles.container}>
-      <Header />
+      <Header 
+        setShowLegend={setShowLegend} 
+        showLegend={showLegend} 
+        setPingConfirm={setPingConfirm}
+      />
       <MapView
         style={styles.map}
         provider={Platform.OS === 'android' ? 'google' : undefined}
@@ -99,8 +108,33 @@ const MapLocation = () => {
         ))}
       </MapView>
       <View style={styles.pingContainer}>
-        <PingingIcon width={65} height={65} />
+        <TouchableOpacity onPress={() => {
+          setPingConfirm(!pingConfirm);
+          setShowLegend(false);
+        }}>
+          <PingingIcon width={65} height={65} />
+        </TouchableOpacity>
       </View>
+      {pingConfirm && (
+        <Pressable 
+          style={styles.overlay} 
+          onPress={() => setPingConfirm(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <MapPingDialog />
+          </TouchableWithoutFeedback>
+        </Pressable>
+      )}
+      {showLegend && (
+        <Pressable 
+          style={styles.overlay} 
+          onPress={() => setShowLegend(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <MapLegendDialog />
+          </TouchableWithoutFeedback>
+        </Pressable>
+      )}
     </View>
   );
 };

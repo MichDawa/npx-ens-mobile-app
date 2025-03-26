@@ -21,8 +21,29 @@ const MapLegendDialog = () => {
         </View>
 
       </View>
-      <LandmarkIcon width={70} height={70} />
-      <ClosedRoadIcon width={70} height={70} />
+
+      <View style={styles.iconsContainer}>
+        <View style={styles.iconRow}>
+          <LandmarkIcon width={60} height={60} />
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>Evacuation Centers</Text>
+            <Text style={styles.description}>
+              Facilities that provide safe refuge and support during emergencies.
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.iconRow}>
+          <ClosedRoadIcon width={60} height={60} style={styles.iconMgn}/>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>Closed Roads</Text>
+            <Text style={styles.description}>
+              Flooded or unsafe roads to travel.
+            </Text>
+          </View>
+        </View>
+      </View>
+      
     </View>
   );
 };

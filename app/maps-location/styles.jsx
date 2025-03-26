@@ -1,5 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { Platform } from 'react-native';
+const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
@@ -31,5 +32,16 @@ export default StyleSheet.create({
     right: 30,
     zIndex: 1,
     elevation: Platform.OS === 'android' ? 50 : 0,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: width,
+    height: height,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    zIndex: 999,
   },
 });
