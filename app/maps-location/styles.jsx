@@ -44,4 +44,20 @@ export default StyleSheet.create({
     backgroundColor: 'transparent',
     zIndex: 999,
   },
+  calloutContainer: {
+    backgroundColor: '#fff',
+    padding: 5,
+    borderRadius: 5,
+    marginBottom: -85,
+  },
+  calloutTitle: {
+    fontFamily: 'SF-Pro-Display-Regular',
+    fontWeight: '500',
+    fontSize: 15,
+    marginBottom: 5,
+  },
+  customCallout: {
+    padding: 0,
+    margin: 0,
+  },
 });

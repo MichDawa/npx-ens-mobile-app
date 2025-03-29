@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   dialogContainer: {
     width: 295,
-    height: 190, // Increased height to accommodate buttons
+    height: 190,
     backgroundColor: '#FFFFFFCF',
     borderRadius: 20,
     padding: 15,
@@ -36,10 +36,6 @@ export default StyleSheet.create({
   },
   iconContainer: {
     marginRight: 1,
-  },
-  iconPlaceholder: {
-    marginLeft: 1,
-    width: 40,
   },
   pingText: {
     fontFamily: 'SF-Pro-Display-Bold',

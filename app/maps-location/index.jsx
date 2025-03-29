@@ -1,7 +1,19 @@
 // react
-import React, { useState } from 'react';
-import { View, Platform, ActivityIndicator, Text, TouchableOpacity, Dimensions, Pressable, TouchableWithoutFeedback } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useState } from "react";
+import {
+  View,
+  Platform,
+  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  Pressable,
+  TouchableWithoutFeedback,
+} from "react-native";
+import MapView, { Marker, Callout } from "react-native-maps";
+
+// svg
+import {Svg, Image as ImageSvg} from 'react-native-svg';
 
 // styles and assets
 import styles from './styles';
@@ -20,14 +32,14 @@ import useMapsLocationState from '../../store/state/maps-location-state';
 
 // others
 import Header from '../components/header/index';
-import MapPingDialog from '../components/ping/index';
+import MapPingDialog from '../components/ping-dialog/index';
 import MapLegendDialog from '../components/map-legend-dialog';
 
 const MapLocation = () => {
   const { location, errorMsg } = useMapsLocationState();
   const [pingConfirm, setPingConfirm] = useState(false);
   const [showLegend, setShowLegend] = useState(false);
-  
+
   const { width, height } = Dimensions.get('window');
 
   if (errorMsg) {
@@ -71,30 +83,63 @@ const MapLocation = () => {
         showsBuildings={false}
         showsIndoors={false}
       >
+        {/* 
+        * User Location
+        */}
         <Marker
           coordinate={{
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           }}
-          title="Your Location"
+          title="My Location"
           description="You are here"
           anchor={{ x: 0.5, y: 1 }}
         >
           <LocationIcon width={48} height={59} />
         </Marker>
 
-        {evacuationCenters.map((center) => (
-          <Marker
-            key={center.id}
-            coordinate={center.coordinate}
-            title={center.title}
-            description={center.description}
-            anchor={{ x: 0.5, y: 1 }}
-          >
-            <LandmarkIcon width={50} height={50} />
-          </Marker>
-        ))}
+        {/* 
+        * Evacuation Centers Location
+        */}
+        {evacuationCenters.map((center) =>
+          Platform.OS === "ios" ? (
+            <Marker
+              key={center.id}
+              coordinate={center.coordinate}
+              title={center.title}
+              anchor={{ x: 0.5, y: 1 }}
+            >
+              <LandmarkIcon width={50} height={50} />
+              <Callout tooltip style={styles.customCallout}>
+                <View style={styles.calloutContainer}>
+                  <Text style={styles.calloutTitle}>{center.title}</Text>
+                  <Svg width={240} height={120}>
+                    <ImageSvg
+                      width="100%"
+                      height="100%"
+                      preserveAspectRatio="xMidYMid slice"
+                      href={{ uri: center.descriptionIOS }}
+                    />
+                  </Svg>
+                </View>
+              </Callout>
+            </Marker>
+          ) : (
+            <Marker
+              key={center.id}
+              coordinate={center.coordinate}
+              title={center.title}
+              description={center.descriptionAndroid}
+              anchor={{ x: 0.5, y: 1 }}
+            >
+              <LandmarkIcon width={50} height={50} />
+            </Marker>
+          )
+        )}
 
+        {/* 
+        * Closed Roads Location
+        */}
         {closedRoads.map((road) => (
           <Marker
             key={road.id}
@@ -107,6 +152,7 @@ const MapLocation = () => {
           </Marker>
         ))}
       </MapView>
+
       <View style={styles.pingContainer}>
         <TouchableOpacity onPress={() => {
           setPingConfirm(!pingConfirm);
@@ -115,6 +161,7 @@ const MapLocation = () => {
           <PingingIcon width={65} height={65} />
         </TouchableOpacity>
       </View>
+
       {pingConfirm && (
         <Pressable 
           style={styles.overlay} 
@@ -125,6 +172,7 @@ const MapLocation = () => {
           </TouchableWithoutFeedback>
         </Pressable>
       )}
+
       {showLegend && (
         <Pressable 
           style={styles.overlay} 

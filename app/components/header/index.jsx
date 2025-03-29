@@ -3,7 +3,6 @@ import { View, Text, SafeAreaView, StatusBar, TouchableOpacity, Dimensions, Pres
 import styles from './styles';
 import BackIcon from '../../../assets/icons/back-icon';
 import LegendIcon from '../../../assets/icons/legend-icon';
-import MapLegendDialog from '../map-legend-dialog';
 
 const { width, height } = Dimensions.get('window');
 
