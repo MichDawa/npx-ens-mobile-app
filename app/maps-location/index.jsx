@@ -29,6 +29,7 @@ import PingingIcon from '../../assets/icons/pinging-icon';
 
 // state
 import useMapsLocationState from '../../store/state/maps-location-state';
+import useMapsUIState from '../../store/state/maps-ui-state';
 
 // others
 import Header from '../components/header/index';
@@ -36,9 +37,17 @@ import MapPingDialog from '../components/ping-dialog/index';
 import MapLegendDialog from '../components/map-legend-dialog';
 
 const MapLocation = () => {
-  const { location, errorMsg } = useMapsLocationState();
-  const [pingConfirm, setPingConfirm] = useState(false);
-  const [showLegend, setShowLegend] = useState(false);
+  const {
+    location,
+    errorMsg,
+    refreshLocation
+  } = useMapsLocationState();
+  const { 
+    pingConfirm, 
+    setPingConfirm, 
+    showLegend, 
+    setShowLegend 
+  } = useMapsUIState();
 
   const { width, height } = Dimensions.get('window');
 
@@ -94,6 +103,7 @@ const MapLocation = () => {
           title="My Location"
           description="You are here"
           anchor={{ x: 0.5, y: 1 }}
+          onPress={refreshLocation}
         >
           <LocationIcon width={48} height={59} />
         </Marker>

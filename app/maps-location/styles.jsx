@@ -48,7 +48,7 @@ export default StyleSheet.create({
     backgroundColor: '#fff',
     padding: 5,
     borderRadius: 5,
-    marginBottom: -85,
+    marginBottom: -100,
   },
   calloutTitle: {
     fontFamily: 'SF-Pro-Display-Regular',
