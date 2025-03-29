@@ -24,6 +24,7 @@ import closedRoads from '../../assets/closed-roads';
 // icons
 import LocationIcon from '../../assets/icons/location-icon';
 import LandmarkIcon from '../../assets/icons/landmark-icon';
+import SmallLandmarkIcon from '../../assets/icons/small-landmark-icon';
 import ClosedRoadIcon from '../../assets/icons/closed-road-icon';
 import PingingIcon from '../../assets/icons/pinging-icon';
 
@@ -122,7 +123,10 @@ const MapLocation = () => {
               <LandmarkIcon width={50} height={50} />
               <Callout tooltip style={styles.customCallout}>
                 <View style={styles.calloutContainer}>
-                  <Text style={styles.calloutTitle}>{center.title}</Text>
+                  <View style={styles.calloutRow}>
+                    <SmallLandmarkIcon width={20} height={20} style={styles.icon} />
+                    <Text style={styles.calloutTitle}>{center.title}</Text>
+                  </View>
                   <Svg width={240} height={120}>
                     <ImageSvg
                       width="100%"

@@ -54,10 +54,17 @@ export default StyleSheet.create({
     fontFamily: 'SF-Pro-Display-Regular',
     fontWeight: '500',
     fontSize: 15,
-    marginBottom: 5,
   },
   customCallout: {
     padding: 0,
     margin: 0,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  calloutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
   },
 });
