@@ -1,5 +1,4 @@
 // react
-import React, { useState } from "react";
 import {
   View,
   Platform,
@@ -36,6 +35,7 @@ import useMapsUIState from '../../store/state/maps-ui-state';
 import Header from '../components/header/index';
 import MapPingDialog from '../components/ping-dialog/index';
 import MapLegendDialog from '../components/map-legend-dialog';
+import EmergencyAlertDialog from '../components/emergency-alert-dialog';
 
 const MapLocation = () => {
   const {
@@ -47,7 +47,9 @@ const MapLocation = () => {
     pingConfirm, 
     setPingConfirm, 
     showLegend, 
-    setShowLegend 
+    setShowLegend,
+    showEmergencyAlert,
+    setShowEmergencyAlert 
   } = useMapsUIState();
 
   const { width, height } = Dimensions.get('window');
@@ -181,8 +183,14 @@ const MapLocation = () => {
           style={styles.overlay} 
           onPress={() => setPingConfirm(false)}
         >
-          <TouchableWithoutFeedback onPress={() => {}}>
-            <MapPingDialog />
+          <TouchableWithoutFeedback>
+            <MapPingDialog 
+              onYesPress={() => {
+                setShowEmergencyAlert(true);
+                setPingConfirm(false);
+              }}
+              onNoPress={() => setPingConfirm(false)}
+            />
           </TouchableWithoutFeedback>
         </Pressable>
       )}
@@ -194,6 +202,17 @@ const MapLocation = () => {
         >
           <TouchableWithoutFeedback onPress={() => {}}>
             <MapLegendDialog />
+          </TouchableWithoutFeedback>
+        </Pressable>
+      )}
+
+      {showEmergencyAlert && (
+        <Pressable 
+          style={styles.overlay} 
+          onPress={() => setShowEmergencyAlert(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <EmergencyAlertDialog />
           </TouchableWithoutFeedback>
         </Pressable>
       )}

@@ -34,9 +34,6 @@ export default StyleSheet.create({
     fontStyle: 'italic',
     textDecorationLine: 'underline',
   },
-  iconContainer: {
-    marginRight: 1,
-  },
   pingText: {
     fontFamily: 'SF-Pro-Display-Bold',
     fontWeight: '700',
