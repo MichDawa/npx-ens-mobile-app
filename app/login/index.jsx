@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, StatusBar, SafeAreaView, Platform } from "react-native";
 import styles from "./styles";
 import { useLoginNavigation } from "../../store/state/login-state";
 
@@ -12,7 +12,7 @@ const LoginPage = () => {
     navigateTo
   } = useLoginNavigation();
 
-  return (
+  const Content = (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
 
@@ -51,6 +51,25 @@ const LoginPage = () => {
         </Text>
       </TouchableOpacity>
     </View>
+  )
+
+  return (
+    <>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+      <View style={styles.absoluteFill}>
+        {Platform.OS === "ios" ? (
+          <SafeAreaView style={styles.iosSafeArea}>
+            {Content}
+            </SafeAreaView>
+        ) : (
+          Content
+        )}
+      </View>
+    </>
   );
 };
 

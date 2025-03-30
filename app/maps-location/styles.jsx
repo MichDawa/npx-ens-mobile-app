@@ -1,5 +1,4 @@
-import { StyleSheet, Dimensions } from 'react-native';
-import { Platform } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
@@ -12,8 +11,11 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   map: {
-    flex: 1,
-    width: '100%',
+    position: 'absolute',
+    top: Platform.OS === 'android' ? 65 : 124,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   errorText: {
     fontSize: 16,
@@ -34,15 +36,12 @@ export default StyleSheet.create({
     elevation: Platform.OS === 'android' ? 50 : 0,
   },
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: width,
-    height: height,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent',
-    zIndex: 999,
+  },
+  emergencyOverlay: {
+    justifyContent: 'flex-end',
   },
   calloutContainer: {
     backgroundColor: '#fff',
@@ -66,5 +65,21 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 5,
+  },
+  iosContainer: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  androidContainer: {
+    flex: 1,
+    backgroundColor: '#051B45',
+  },
+  absoluteFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#051B45',
   },
 });

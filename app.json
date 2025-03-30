@@ -20,11 +20,14 @@
       }
     },
     "ios": {
+      "requireFullScreen": true,
       "config": {
         "googleMapsApiKey": "${MAPS_API_KEY}"
       },
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Allow ENS Mobile App to access your location while you are using the app."
+        "NSLocationWhenInUseUsageDescription": "Allow ENS Mobile App to access your location while you are using the app.",
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "UIStatusBarHidden": false
       }
     },
     "web": {

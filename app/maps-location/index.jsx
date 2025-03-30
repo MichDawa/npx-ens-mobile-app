@@ -8,6 +8,8 @@ import {
   Dimensions,
   Pressable,
   TouchableWithoutFeedback,
+  StatusBar,
+  SafeAreaView,
 } from "react-native";
 import MapView, { Marker, Callout } from "react-native-maps";
 
@@ -54,25 +56,8 @@ const MapLocation = () => {
 
   const { width, height } = Dimensions.get('window');
 
-  if (errorMsg) {
-    return (
-      <View style={styles.centeredContainer}>
-        <Text style={styles.errorText}>{errorMsg}</Text>
-      </View>
-    );
-  }
-
-  if (!location) {
-    return (
-      <View style={styles.centeredContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.loadingText}>Getting your location...</Text>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
+  const renderContent = () => (
+    <>
       <Header 
         setShowLegend={setShowLegend} 
         showLegend={showLegend} 
@@ -82,47 +67,40 @@ const MapLocation = () => {
         style={styles.map}
         provider={Platform.OS === 'android' ? 'google' : undefined}
         customMapStyle={mapStyle}
-        initialRegion={{
+        initialRegion={location?.coords && {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
-        mapType="hybrid" //note to have this be to toggled either hybrid or standard map
+        mapType="hybrid"
         showsUserLocation={false}
-        showsMyLocationButton={true}
+        showsMyLocationButton
         showsPointsOfInterest={false}
         showsBuildings={false}
-        showsIndoors={false}
       >
-        {/* 
-        * User Location
-        */}
-        <Marker
-          coordinate={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }}
-          title="My Location"
-          description="You are here"
-          anchor={{ x: 0.5, y: 1 }}
-          onPress={refreshLocation}
-        >
-          <LocationIcon width={48} height={59} />
-        </Marker>
+        {location?.coords && (
+          <Marker
+            coordinate={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }}
+            anchor={{ x: 0.5, y: 1 }}
+            onPress={refreshLocation}
+          >
+            <LocationIcon width={48} height={59} />
+          </Marker>
+        )}
 
-        {/* 
-        * Evacuation Centers Location
-        */}
-        {evacuationCenters.map((center) =>
-          Platform.OS === "ios" ? (
-            <Marker
-              key={center.id}
-              coordinate={center.coordinate}
-              title={center.title}
-              anchor={{ x: 0.5, y: 1 }}
-            >
-              <LandmarkIcon width={50} height={50} />
+        {evacuationCenters.map((center) => (
+          <Marker
+            key={center.id}
+            coordinate={center.coordinate}
+            title={center.title}
+            anchor={{ x: 0.5, y: 1 }}
+          >
+            <LandmarkIcon width={50} height={50} />
+            {Platform.OS === "ios" && (
               <Callout tooltip style={styles.customCallout}>
                 <View style={styles.calloutContainer}>
                   <View style={styles.calloutRow}>
@@ -139,23 +117,10 @@ const MapLocation = () => {
                   </Svg>
                 </View>
               </Callout>
-            </Marker>
-          ) : (
-            <Marker
-              key={center.id}
-              coordinate={center.coordinate}
-              title={center.title}
-              description={center.descriptionAndroid}
-              anchor={{ x: 0.5, y: 1 }}
-            >
-              <LandmarkIcon width={50} height={50} />
-            </Marker>
-          )
-        )}
+            )}
+          </Marker>
+        ))}
 
-        {/* 
-        * Closed Roads Location
-        */}
         {closedRoads.map((road) => (
           <Marker
             key={road.id}
@@ -179,44 +144,69 @@ const MapLocation = () => {
       </View>
 
       {pingConfirm && (
-        <Pressable 
-          style={styles.overlay} 
-          onPress={() => setPingConfirm(false)}
-        >
-          <TouchableWithoutFeedback>
-            <MapPingDialog 
-              onYesPress={() => {
-                setShowEmergencyAlert(true);
-                setPingConfirm(false);
-              }}
-              onNoPress={() => setPingConfirm(false)}
-            />
-          </TouchableWithoutFeedback>
+        <Pressable style={styles.overlay} onPress={() => setPingConfirm(false)}>
+          <MapPingDialog 
+            onYesPress={() => {
+              setShowEmergencyAlert(true);
+              setPingConfirm(false);
+            }}
+            onNoPress={() => setPingConfirm(false)}
+          />
         </Pressable>
       )}
 
       {showLegend && (
-        <Pressable 
-          style={styles.overlay} 
-          onPress={() => setShowLegend(false)}
-        >
-          <TouchableWithoutFeedback onPress={() => {}}>
-            <MapLegendDialog />
-          </TouchableWithoutFeedback>
+        <Pressable style={styles.overlay} onPress={() => setShowLegend(false)}>
+          <MapLegendDialog />
         </Pressable>
       )}
 
       {showEmergencyAlert && (
         <Pressable 
-          style={styles.overlay} 
+          style={[styles.overlay, styles.emergencyOverlay]} 
           onPress={() => setShowEmergencyAlert(false)}
         >
-          <TouchableWithoutFeedback onPress={() => {}}>
-            <EmergencyAlertDialog />
-          </TouchableWithoutFeedback>
+          <EmergencyAlertDialog />
         </Pressable>
       )}
+    </>
+  );
+
+  if (errorMsg) return (
+    <View style={styles.centeredContainer}>
+      <Text style={styles.errorText}>{errorMsg}</Text>
     </View>
+  );
+
+  if (!location) return (
+    <View style={styles.centeredContainer}>
+      <ActivityIndicator size="large" color="#0000ff" />
+      <Text style={styles.loadingText}>Getting your location...</Text>
+    </View>
+  );
+
+  return (
+    <>
+      <StatusBar
+        translucent={Platform.OS === 'ios'}
+        backgroundColor="#051B45"
+        barStyle="light-content"
+      />
+      {Platform.OS === 'ios' ? (
+        <View style={styles.absoluteFill}>
+          <SafeAreaView 
+            style={styles.iosContainer}
+            edges={['top', 'left', 'right']}
+          >
+            {renderContent()}
+          </SafeAreaView>
+        </View>
+      ) : (
+        <View style={styles.androidContainer}>
+          {renderContent()}
+        </View>
+      )}
+    </>
   );
 };
 

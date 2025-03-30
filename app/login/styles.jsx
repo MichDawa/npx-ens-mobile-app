@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export default StyleSheet.create({
   container: {
@@ -67,5 +67,18 @@ export default StyleSheet.create({
   },
   signUpSubtitlePressed: {
     color: '#003077',
+  },
+  absoluteFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#F5FCFF',
+  },
+  iosSafeArea: {
+    flex: 1,
+    backgroundColor: '#F5FCFF',
+    paddingHorizontal: Platform.OS === 'ios' ? 16 : 0,
   },
 });

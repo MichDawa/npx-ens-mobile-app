@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, StatusBar, SafeAreaView, Platform } from "react-native";
 import { useSignUpNavigation } from "../../store/state/sign-up-state";
 import styles from "./styles";
 
@@ -14,7 +14,7 @@ const SignUpPage = () => {
     navigateTo
   } = useSignUpNavigation();
 
-  return (
+  const Content = (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
 
@@ -65,6 +65,26 @@ const SignUpPage = () => {
         </Text>
       </TouchableOpacity>
     </View>
+  )
+
+  return (
+    <>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+      <View style={styles.absoluteFill}>
+        {Platform.OS === 'ios' ? (
+          <SafeAreaView style={styles.iosSafeArea}>
+            {Content}
+          </SafeAreaView>
+        ) : (
+          Content
+        )}
+      </View>
+    </>
+    
   );
 };
 

@@ -29,7 +29,7 @@ export default StyleSheet.create({
     color: '#004aad',
   },
   buttonContainer: {
-    flexDirection: 'col',
+    flexDirection: 'column',
     gap: 20,
   },
   button: {

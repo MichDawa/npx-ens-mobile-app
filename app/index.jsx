@@ -1,9 +1,12 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, StatusBar, SafeAreaView, Platform, Dimensions } from 'react-native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import HomePage from './homescreen/index';
+
+const { width, height } = Dimensions.get('window');
 
 const StackNavigator = () => (
   <Stack>
@@ -68,5 +71,38 @@ export default function App() {
     return null;
   }
 
-  return <HomePage />;
+  return (
+    <>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+      <View style={styles.absoluteFill}>
+        {Platform.OS === 'ios' ? (
+          <SafeAreaView style={styles.iosSafeArea}>
+            <HomePage />
+          </SafeAreaView>
+        ) : (
+          <HomePage />
+        )}
+      </View>
+    </>
+  );
 }
+
+const styles = StyleSheet.create({
+  absoluteFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#F5FCFF',
+  },
+  iosSafeArea: {
+    flex: 1,
+    backgroundColor: '#F5FCFF',
+    paddingHorizontal: Platform.OS === 'ios' ? 16 : 0,
+  },
+});

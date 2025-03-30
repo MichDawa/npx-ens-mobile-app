@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export default StyleSheet.create({
   container: {
@@ -25,7 +25,6 @@ export default StyleSheet.create({
     fontSize: 20,
     fontFamily: 'SF-Pro-Display-Bold',
     textAlign: 'center',
-    marginHorizontal: 5,
   },
   contentContainer: {
     flex: 1,
@@ -37,5 +36,10 @@ export default StyleSheet.create({
     fontSize: 18,
     fontFamily: 'SF-Pro-Display-Regular',
     textAlign: 'center',
+    marginHorizontal: Platform.OS === 'android' ? 25 : 50,
+  },
+  boldText: {
+    fontFamily: 'SF-Pro-Display-Bold',
+    fontWeight: 'bold',
   },
 });
