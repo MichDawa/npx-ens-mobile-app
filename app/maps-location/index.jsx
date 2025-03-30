@@ -97,6 +97,7 @@ const MapLocation = () => {
             key={center.id}
             coordinate={center.coordinate}
             title={center.title}
+            description={center.descriptionAndroid}
             anchor={{ x: 0.5, y: 1 }}
           >
             <LandmarkIcon width={50} height={50} />
