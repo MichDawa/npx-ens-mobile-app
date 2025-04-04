@@ -36,9 +36,9 @@ const MapLegendDialog = () => {
         <View style={styles.iconRow}>
           <ClosedRoadIcon width={60} height={60} style={styles.iconMgn}/>
           <View style={styles.textContainer}>
-            <Text style={styles.title}>Closed Roads</Text>
+            <Text style={styles.title}>Flooded Areas</Text>
             <Text style={styles.description}>
-              Flooded or unsafe roads to travel.
+              Flooded or unsafe areas to travel.
             </Text>
           </View>
         </View>

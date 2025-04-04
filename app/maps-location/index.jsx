@@ -12,6 +12,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import MapView, { Marker, Callout } from "react-native-maps";
+import { useEffect, useRef } from 'react';
 
 // svg
 import {Svg, Image as ImageSvg} from 'react-native-svg';
@@ -28,6 +29,7 @@ import LandmarkIcon from '../../assets/icons/landmark-icon';
 import SmallLandmarkIcon from '../../assets/icons/small-landmark-icon';
 import ClosedRoadIcon from '../../assets/icons/closed-road-icon';
 import PingingIcon from '../../assets/icons/pinging-icon';
+import AlertMarkIcon from '../../assets/icons/alert-mark-icon';
 
 // state
 import useMapsLocationState from '../../store/state/maps-location-state';
@@ -53,6 +55,28 @@ const MapLocation = () => {
     showEmergencyAlert,
     setShowEmergencyAlert 
   } = useMapsUIState();
+
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showEmergencyAlert) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      timeoutRef.current = setTimeout(() => {
+        setShowEmergencyAlert(false);
+      }, 3000); // 3 seconds
+    }
+  }, [showEmergencyAlert]);
 
   const { width, height } = Dimensions.get('window');
 
@@ -80,16 +104,51 @@ const MapLocation = () => {
         showsBuildings={false}
       >
         {location?.coords && (
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            anchor={{ x: 0.5, y: 1 }}
-            onPress={refreshLocation}
-          >
-            <LocationIcon width={48} height={59} />
-          </Marker>
+          showEmergencyAlert ? (
+            <Marker
+              coordinate={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }}
+              anchor={{ x: 0.5, y: 0.5 }}
+            >
+              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ 
+                  position: 'absolute',
+                  zIndex: 0,
+                }}>
+                  <AlertMarkIcon width={170} height={170} />
+                </View>
+                
+                <View style={{ 
+                  position: 'relative',
+                  zIndex: 1,
+                  transform: [
+                    { translateY: -20 },
+                    { translateX: 5 }
+                  ]
+                }}>
+                  <Pressable
+                    onPress={refreshLocation}
+                    android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true }}
+                  >
+                    <LocationIcon width={48} height={59} />
+                  </Pressable>
+                </View>
+              </View>
+            </Marker>
+          ) : (
+            <Marker
+              coordinate={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }}
+              anchor={{ x: 0.5, y: 1 }}
+              onPress={refreshLocation}
+            >
+              <LocationIcon width={48} height={59} />
+            </Marker>
+          )
         )}
 
         {evacuationCenters.map((center) => (
@@ -135,14 +194,16 @@ const MapLocation = () => {
         ))}
       </MapView>
 
-      <View style={styles.pingContainer}>
-        <TouchableOpacity onPress={() => {
-          setPingConfirm(!pingConfirm);
-          setShowLegend(false);
-        }}>
-          <PingingIcon width={65} height={65} />
-        </TouchableOpacity>
-      </View>
+      {!showEmergencyAlert && (
+        <View style={styles.pingContainer}>
+          <TouchableOpacity onPress={() => {
+            setPingConfirm(!pingConfirm);
+            setShowLegend(false);
+          }}>
+            <PingingIcon width={65} height={65} />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {pingConfirm && (
         <Pressable style={styles.overlay} onPress={() => setPingConfirm(false)}>
@@ -165,7 +226,6 @@ const MapLocation = () => {
       {showEmergencyAlert && (
         <Pressable 
           style={[styles.overlay, styles.emergencyOverlay]} 
-          onPress={() => setShowEmergencyAlert(false)}
         >
           <EmergencyAlertDialog />
         </Pressable>
