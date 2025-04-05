@@ -7,6 +7,7 @@ import {
   Pressable,
   StatusBar,
   SafeAreaView,
+  Animated,
 } from "react-native";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import { useEffect, useRef, useState } from 'react';
@@ -38,10 +39,9 @@ import MapPingDialog from '../components/ping-dialog/index';
 import MapLegendDialog from '../components/map-legend-dialog';
 import EmergencyAlertDialog from '../components/emergency-alert-dialog';
 
-// Standard zoom level for all regions
 const STANDARD_ZOOM = {
-  latitudeDelta: 0.07,
-  longitudeDelta: 0.07,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05,
 };
 
 const MapLocation = () => {
@@ -61,6 +61,66 @@ const MapLocation = () => {
 
   const mapRef = useRef(null);
   const timeoutRef = useRef(null);
+
+  const [isPingDialogMounted, setIsPingDialogMounted] = useState(false);
+  const pingConfirmOpacity = useRef(new Animated.Value(0)).current;
+
+  const [isLegendMounted, setIsLegendMounted] = useState(false);
+  const legendOpacity = useRef(new Animated.Value(0)).current;
+
+  const [isEmergencyMounted, setIsEmergencyMounted] = useState(false);
+  const emergencyOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (pingConfirm) {
+      setIsPingDialogMounted(true);
+      Animated.timing(pingConfirmOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(pingConfirmOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setIsPingDialogMounted(false));
+    }
+  }, [pingConfirm]);
+  
+  useEffect(() => {
+    if (showLegend) {
+      setIsLegendMounted(true);
+      Animated.timing(legendOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(legendOpacity, {
+        toValue: 0,
+              duration: 300,
+        useNativeDriver: true,
+      }).start(() => setIsLegendMounted(false));
+    }
+  }, [showLegend]);
+
+  useEffect(() => {
+    if (showEmergencyAlert) {
+      setIsEmergencyMounted(true);
+      Animated.timing(emergencyOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(emergencyOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setIsEmergencyMounted(false));
+    }
+  }, [showEmergencyAlert]);
   
   useEffect(() => {
     return () => {
@@ -72,6 +132,7 @@ const MapLocation = () => {
     if (showEmergencyAlert) {
       timeoutRef.current = setTimeout(() => {
         setShowEmergencyAlert(false);
+        // setTimeout(() => setPingConfirm(true), 300);
       }, 3000);
     }
     return () => clearTimeout(timeoutRef.current);
@@ -81,7 +142,6 @@ const MapLocation = () => {
     setPingConfirm(false);
     
     if (mapRef?.current && location?.coords) {
-      // Unified animation for both platforms
       mapRef.current.animateToRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -114,6 +174,7 @@ const MapLocation = () => {
         setShowLegend={setShowLegend} 
         showLegend={showLegend} 
         setPingConfirm={setPingConfirm}
+        red={showEmergencyAlert}
       />
       <MapView
         ref={mapRef}
@@ -224,25 +285,44 @@ const MapLocation = () => {
         </View>
       )}
 
-      {pingConfirm && (
-        <Pressable style={styles.overlay} onPress={() => setPingConfirm(false)}>
-          <MapPingDialog 
-            onYesPress={handleYesPress}
-            onNoPress={() => setPingConfirm(false)}
-          />
-        </Pressable>
+      {/* Ping Dialog */}
+      {isPingDialogMounted && (
+        <Animated.View style={[styles.overlay, { opacity: pingConfirmOpacity }]}>
+          <Pressable 
+            style={[styles.absoluteFill, { 
+              justifyContent: 'center', 
+              alignItems: 'center' 
+            }]} 
+            onPress={() => setPingConfirm(false)}
+          >
+            <MapPingDialog
+              onYesPress={handleYesPress}
+              onNoPress={() => setPingConfirm(false)}
+            />
+          </Pressable>
+        </Animated.View>
       )}
 
-      {showLegend && (
-        <Pressable style={styles.overlay} onPress={() => setShowLegend(false)}>
-          <MapLegendDialog />
-        </Pressable>
+      {/* Legend Dialog */}
+      {isLegendMounted && (
+        <Animated.View style={[styles.overlay, { opacity: legendOpacity }]}>
+          <Pressable
+            style={[styles.absoluteFill, { 
+              justifyContent: 'center', 
+              alignItems: 'center' 
+            }]}
+            onPress={() => setShowLegend(false)}
+          >
+            <MapLegendDialog />
+          </Pressable>
+        </Animated.View>
       )}
 
-      {showEmergencyAlert && (
-        <Pressable style={[styles.overlay, styles.emergencyOverlay]}>
-          <EmergencyAlertDialog />
-        </Pressable>
+      {/* Emergency Alert */}
+      {isEmergencyMounted && (
+        <Animated.View style={[styles.overlay, styles.emergencyOverlay, { opacity: emergencyOpacity }]}>
+            <EmergencyAlertDialog />
+        </Animated.View>
       )}
     </>
   );
@@ -263,12 +343,24 @@ const MapLocation = () => {
   return (
     <>
       <StatusBar
-        translucent={Platform.OS === 'ios'}
-        backgroundColor="#051B45"
+        translucent={Platform.OS === 'ios' || showEmergencyAlert}
+        backgroundColor={
+          showEmergencyAlert
+            ? '#922418'
+            : '#051B45'
+        }
         barStyle="light-content"
       />
       {Platform.OS === 'ios' ? (
-        <View style={styles.absoluteFill}>
+        <View
+          style={[
+            styles.absoluteFill,
+            { backgroundColor: showEmergencyAlert
+              ? '#922418'
+              : '#051B45'
+            }
+          ]}
+        >
           <SafeAreaView 
             style={styles.iosContainer}
             edges={['top', 'left', 'right']}
@@ -277,7 +369,10 @@ const MapLocation = () => {
           </SafeAreaView>
         </View>
       ) : (
-        <View style={styles.androidContainer}>
+        <View style={[
+          styles.androidContainer,
+          showEmergencyAlert && styles.androidEmergencyContainer
+        ]}>
           {renderContent()}
         </View>
       )}

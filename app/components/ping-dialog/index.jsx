@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import SmallPingingIcon from '../../../assets/icons/small-pinging-icon';
 import styles from './styles';
 

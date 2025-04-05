@@ -3,12 +3,8 @@ const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
-    backgroundColor: '#051B45',
     zIndex: 1,
     overflow: 'visible',
-  },
-  headerSafeArea: {
-    backgroundColor: '#0B42AB',
   },
   header: {
     height: 65,
@@ -16,6 +12,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    backgroundColor: '#0B42AB'
   },
   leftContainer: {
     flexDirection: 'row',
