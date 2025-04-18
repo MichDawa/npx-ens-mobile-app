@@ -1,6 +1,20 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { CloudWithLightning, PartlyCloudy, LightRain, HeavyRain } from './WeatherIcons';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { 
+  CloudWithLightning, 
+  PartlyCloudy, 
+  LightRain, 
+  HeavyRain, 
+  Thunderstorm,
+  CloudyNight 
+} from './WeatherIcons';
+
+// Import icons
+const floodIcon = require('../../assets/images/icons/flood.png');
+const rainDropsIcon = require('../../assets/images/icons/rain-drops.png');
+const temperatureIcon = require('../../assets/images/icons/temperature.png');
+const windIcon = require('../../assets/images/icons/winds.png');
+const mapPinIcon = require('../../assets/images/map-pin.png');
 
 const WeatherDashboard = ({ onBack }) => {
   // Mock data (would be fetched from API in real application)
@@ -19,7 +33,7 @@ const WeatherDashboard = ({ onBack }) => {
       { time: '15.00', temp: '29°C', icon: 'partly-cloudy' },
       { time: '16.00', temp: '26°C', icon: 'light-rain' },
       { time: '17.00', temp: '24°C', icon: 'heavy-rain' },
-      { time: '18.00', temp: '23°C', icon: 'partly-cloudy' }
+      { time: '18.00', temp: '23°C', icon: 'cloudy-night' }
     ]
   };
 
@@ -36,7 +50,7 @@ const WeatherDashboard = ({ onBack }) => {
         >
           <Text style={[styles.hourlyTemp, isActive && styles.hourlyTextActive]}>{hour.temp}</Text>
           <View style={styles.hourlyIconContainer}>
-            {renderWeatherIcon(hour.icon, 40)}
+            {renderWeatherIcon(hour.icon, 100)}
           </View>
           <Text style={[styles.hourlyTime, isActive && styles.hourlyTextActive]}>{hour.time}</Text>
         </View>
@@ -52,6 +66,10 @@ const WeatherDashboard = ({ onBack }) => {
         return <LightRain size={size} />;
       case 'heavy-rain':
         return <HeavyRain size={size} />;
+      case 'thunderstorm':
+        return <Thunderstorm size={size} />;
+      case 'cloudy-night':
+        return <CloudyNight size={size} />;
       default:
         return <PartlyCloudy size={size} />;
     }
@@ -61,6 +79,26 @@ const WeatherDashboard = ({ onBack }) => {
     if (onBack) {
       onBack();
     }
+  };
+
+  // Determine current weather icon based on condition
+  const getMainWeatherIcon = () => {
+    const condition = weatherData.condition.toLowerCase();
+    
+    if (condition.includes('rain') || condition.includes('rainy')) {
+      return <CloudWithLightning size={180} />;
+    }
+    
+    if (condition.includes('thunder') || condition.includes('lightning')) {
+      return <Thunderstorm size={180} />;
+    }
+    
+    if (condition.includes('cloud')) {
+      return <PartlyCloudy size={180} />;
+    }
+    
+    // Default
+    return <CloudWithLightning size={180} />;
   };
 
   return (
@@ -73,75 +111,102 @@ const WeatherDashboard = ({ onBack }) => {
         <Text style={styles.backButtonText}>←</Text>
       </TouchableOpacity>
       
-      {/* Location and Date */}
+      {/* Location and Date - Updated to match the image */}
       <View style={styles.header}>
-        <Text style={styles.location}>{weatherData.location}</Text>
+        <Text style={styles.locationName}>Surigao,</Text>
+        <Text style={styles.countryName}>Philippines</Text>
         <Text style={styles.date}>{weatherData.date}</Text>
       </View>
 
       {/* Main Weather Display */}
       <View style={styles.mainWeather}>
         <View style={styles.weatherDisplay}>
-          <View style={styles.weatherIconLarge}>
-            <CloudWithLightning size={200} />
+          {/* Weather Icon - 50% width */}
+          <View style={styles.weatherIconContainer}>
+            <View style={styles.weatherIconLarge}>
+              {getMainWeatherIcon()}
+            </View>
           </View>
           
-          <View style={styles.tempSection}>
-            <View style={styles.tempContainer}>
-              <View style={styles.temperatureWrapper}>
-                <Text style={styles.temperature}>{weatherData.temperature}</Text>
-                <View style={styles.conditionContainer}>
-                  <Text style={styles.condition}>{weatherData.condition}</Text>
+          {/* Temperature Section - 50% width */}
+          <View style={styles.temperatureContainer}>
+            <View style={styles.tempSection}>
+              <View style={styles.tempContainer}>
+                <View style={styles.temperatureWrapper}>
+                  <Text style={styles.temperature}>{weatherData.temperature}</Text>
+                  <View style={styles.conditionContainer}>
+                    <Text style={styles.condition}>{weatherData.condition}</Text>
+                  </View>
                 </View>
+                <Text style={styles.degreeSymbol}>°C</Text>
               </View>
-              <Text style={styles.degreeSymbol}>°C</Text>
             </View>
           </View>
         </View>
       </View>
 
-      {/* Flood Risk Indicator */}
+      {/* Flood Risk Indicator - Updated to match image */}
       <View style={styles.riskContainer}>
         <View style={styles.riskIndicator}>
-          <Text style={styles.riskText}>Flood Risk Level</Text>
+          <View style={styles.riskTextContainer}>
+            <Image source={floodIcon} style={styles.floodIcon} />
+            <Text style={styles.riskText}>Flood Risk Level</Text>
+          </View>
           <Text style={styles.riskLevel}>{weatherData.floodRisk.level}</Text>
         </View>
       </View>
 
-      {/* Weather Statistics */}
+      {/* Weather Statistics - Updated to match image */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text style={styles.statIcon}>💧</Text>
+          <Image source={rainDropsIcon} style={styles.statIcon} />
           <Text style={styles.statValue}>{weatherData.stats.humidity}</Text>
         </View>
-        <View style={styles.statDivider}></View>
         <View style={styles.statItem}>
-          <Text style={styles.statIcon}>🌡️</Text>
+          <Image source={temperatureIcon} style={styles.statIcon} />
           <Text style={styles.statValue}>{weatherData.stats.pressure}</Text>
         </View>
-        <View style={styles.statDivider}></View>
         <View style={styles.statItem}>
-          <Text style={styles.statIcon}>💨</Text>
+          <Image source={windIcon} style={styles.statIcon} />
           <Text style={styles.statValue}>{weatherData.stats.windSpeed}</Text>
         </View>
       </View>
 
-      {/* Hourly Forecast */}
-      <View style={styles.hourlyContainer}>
-        <View style={styles.hourlyHeader}>
-          <Text style={styles.hourlyTitle}>Today</Text>
-          <Text style={styles.hourlyDate}>Mar, 9</Text>
+      {/* Hourly Forecast - Redesigned to match the image */}
+      <View style={styles.hourlyForecastContainer}>
+        <View style={styles.hourlyForecastHeader}>
+          <Text style={styles.hourlyForecastTitle}>Today</Text>
+          <Text style={styles.hourlyForecastDate}>Mar, 9</Text>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hourlyScroll}>
-          <View style={styles.hourlyItems}>
-            {renderHourlyForecast()}
+        <View style={styles.hourlyForecastContent}>
+          <View style={styles.hourlyForecastCards}>
+            {weatherData.hourlyForecast.map((hour, index) => {
+              const isActive = hour.time === '17.00';
+              return (
+                <View 
+                  key={index} 
+                  style={[
+                    styles.hourlyForecastCard,
+                    isActive && styles.hourlyForecastCardActive
+                  ]}
+                >
+                  <Text style={styles.hourlyForecastTemp}>{hour.temp}</Text>
+                  <View style={styles.hourlyForecastIconContainer}>
+                    {renderWeatherIcon(hour.icon, 100)}
+                  </View>
+                  <Text style={styles.hourlyForecastTime}>{hour.time}</Text>
+                </View>
+              );
+            })}
           </View>
-        </ScrollView>
+        </View>
       </View>
 
       {/* Location Button */}
       <TouchableOpacity style={styles.locationButton}>
-        <Text style={styles.locationIcon}>📍</Text>
+        <View style={styles.locationButtonBackground}>
+          <Image source={mapPinIcon} style={styles.locationButtonIcon} />
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -159,6 +224,7 @@ const styles = StyleSheet.create({
     left: 15,
     padding: 10,
     zIndex: 10,
+    display: 'none'
   },
   backButtonText: {
     fontSize: 24,
@@ -167,35 +233,56 @@ const styles = StyleSheet.create({
   },
   header: {
     marginTop: 40,
+    paddingLeft: 10,
   },
-  location: {
-    fontSize: 32,
-    fontWeight: 'bold',
+  locationName: {
+    fontSize: 40,
+    fontWeight: '400',
     color: 'white',
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins',
+    letterSpacing: 0.5,
+    lineHeight: 45,
+  },
+  countryName: {
+    fontSize: 40,
+    fontWeight: 'regular',
+    color: 'white',
+    fontFamily: 'Poppins',
+    letterSpacing: 0.5,
+    lineHeight: 45,
   },
   date: {
-    fontSize: 16,
-    color: '#ffffff90',
+    fontSize: 14,
+    color: '#ffffff80',
     fontFamily: 'Poppins-Regular',
+    marginTop: 5,
   },
   mainWeather: {
-    marginTop: 20,
+    marginTop: 10,
   },
   weatherDisplay: {
     flexDirection: 'row',
+    marginBottom: 20,
+    width: '100%',
+  },
+  weatherIconContainer: {
+    width: '50%',
     alignItems: 'center',
     justifyContent: 'center',
   },
   weatherIconLarge: {
-    width: 200,
-    height: 180,
+    marginBottom: -10,
+    paddingTop: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+  },
+  temperatureContainer: {
+    width: '50%',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
   tempSection: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
   },
   tempContainer: {
@@ -226,17 +313,28 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   riskContainer: {
-    marginTop: 30,
+    marginTop: 20,
     alignItems: 'center',
   },
   riskIndicator: {
     backgroundColor: '#ED553B',
-    borderRadius: 25,
-    paddingVertical: 10,
+    borderRadius: 20,
+    paddingVertical: 15,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     width: '100%',
+  },
+  riskTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  floodIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+    tintColor: 'white',
   },
   riskText: {
     color: 'white',
@@ -249,9 +347,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   statsContainer: {
-    marginTop: 20,
-    backgroundColor: '#00397d',
-    borderRadius: 15,
+    marginTop: 15,
+    backgroundColor: '#002f6c',
+    borderRadius: 20,
     padding: 15,
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -259,44 +357,92 @@ const styles = StyleSheet.create({
   statItem: {
     alignItems: 'center',
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   statIcon: {
-    fontSize: 18,
-    marginBottom: 5,
+    width: 25,
+    height: 25,
+    marginRight: 8,
+    tintColor: 'white',
   },
   statValue: {
     color: 'white',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
   },
-  statDivider: {
-    width: 1,
-    backgroundColor: '#ffffff50',
+  
+  // Hourly Forecast - New styles matching the image
+  hourlyForecastContainer: {
+    marginTop: 15,
+    paddingBottom: 20,
+    backgroundColor: '#002f6c',
+    borderRadius: 20,
+    paddingTop: 15,
+    paddingHorizontal: 15,
   },
-  hourlyContainer: {
-    marginTop: 20,
-    flex: 1,
-  },
-  hourlyHeader: {
+  hourlyForecastHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
     marginBottom: 15,
   },
-  hourlyTitle: {
-    color: 'white',
+  hourlyForecastTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  hourlyDate: {
     color: 'white',
+  },
+  hourlyForecastDate: {
     fontSize: 18,
+    color: 'white',
   },
-  hourlyScroll: {
-    
+  hourlyForecastContent: {
+    paddingHorizontal: 5,
   },
-  hourlyItems: {
+  hourlyForecastCards: {
     flexDirection: 'row',
-    paddingBottom: 10,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 5,
+  },
+  hourlyForecastCard: {
+    width: '23%',
+    height: 150,
+    backgroundColor: '#00397d',
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    paddingHorizontal: 5,
+  },
+  hourlyForecastCardActive: {
+    backgroundColor: '#0056c7',
+    borderWidth: 2,
+    borderColor: '#4080f0',
+  },
+  hourlyForecastTemp: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 2,
+  },
+  hourlyForecastIconContainer: {
+    height: 65,
+    width: 65,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  hourlyForecastTime: {
+    fontSize: 16,
+    color: 'white',
+    marginTop: 2,
+  },
+  hourlyIconContainer: {
+    height: 50,
+    width: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   hourlyItem: {
     backgroundColor: '#00397d',
@@ -323,25 +469,31 @@ const styles = StyleSheet.create({
   hourlyTextActive: {
     fontWeight: 'bold',
   },
-  hourlyIconContainer: {
-    height: 40,
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   locationButton: {
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: '#2596be',
     width: 60,
     height: 60,
     borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  locationButtonBackground: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#539DF3', // Main blue color from the image
   },
-  locationIcon: {
-    fontSize: 24,
+  locationButtonIcon: {
+    width: 32,
+    height: 32,
+    tintColor: 'white',
   },
 });
 
