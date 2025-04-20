@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, TextInput, StatusBar, SafeAreaView, Platform } from "react-native";
 import styles from "./styles";
 import { useLoginNavigation } from "../../store/state/login-state";
+import MobileAppApiService from "../../services/mobile-app-api.service";
 
 const LoginPage = () => {
   const {
@@ -11,6 +12,10 @@ const LoginPage = () => {
     handlePressState,
     navigateTo
   } = useLoginNavigation();
+
+  const param = {
+    value: "test frontend"
+  };
 
   const Content = (
     <View style={styles.container}>
@@ -30,7 +35,15 @@ const LoginPage = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => navigateTo('/otp')}
+          onPress={async () => {
+            try {
+              await MobileAppApiService.addTest( param );
+              navigateTo('/otp');
+            } catch (error) {
+              console.error('API Error:', error);
+              alert('Failed to submit test data');
+            }
+          }}
         >
           <Text style={styles.buttonText}>
             <Text style={styles.nextColor}>Next</Text>
