@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Platform, StatusBar, SafeAreaView } from 'react-native';
 import { 
   CloudWithLightning, 
   PartlyCloudy, 
@@ -9,6 +9,9 @@ import {
   CloudyNight 
 } from './WeatherIcons';
 import styles from './styles';
+import { useRouter } from 'expo-router';
+import { useDashboardState } from "../../store/state/dashboard-state";
+
 
 // Import icons
 const floodIcon = require('../../assets/images/icons/flood.png');
@@ -17,72 +20,10 @@ const temperatureIcon = require('../../assets/images/icons/temperature.png');
 const windIcon = require('../../assets/images/icons/winds.png');
 const mapPinIcon = require('../../assets/images/map-pin.png');
 
-const WeatherDashboard = ({ onBack }) => {
-  // Mock data (would be fetched from API in real application)
-  const weatherData = {
-    location: 'Surigao, Philippines',
-    date: 'Sun, March 9',
-    temperature: 19,
-    condition: 'Rainy',
-    floodRisk: { level: 'High Risk' },
-    stats: {
-      humidity: '6%',
-      pressure: '90%',
-      windSpeed: '19 km/h'
-    },
-    hourlyForecast: [
-      { time: '15.00', temp: '29°C', icon: 'partly-cloudy' },
-      { time: '16.00', temp: '26°C', icon: 'light-rain' },
-      { time: '17.00', temp: '24°C', icon: 'heavy-rain' },
-      { time: '18.00', temp: '23°C', icon: 'cloudy-night' }
-    ]
-  };
+const WeatherDashboard = () => {
+  const { weatherData, navigateTo } = useDashboardState();
 
-  const renderHourlyForecast = () => {
-    return weatherData.hourlyForecast.map((hour, index) => {
-      const isActive = hour.time === '17.00'; // For highlighting the active hour
-      return (
-        <View 
-          key={index} 
-          style={[
-            styles.hourlyItem, 
-            isActive && styles.hourlyItemActive
-          ]}
-        >
-          <Text style={[styles.hourlyTemp, isActive && styles.hourlyTextActive]}>{hour.temp}</Text>
-          <View style={styles.hourlyIconContainer}>
-            {renderWeatherIcon(hour.icon, 100)}
-          </View>
-          <Text style={[styles.hourlyTime, isActive && styles.hourlyTextActive]}>{hour.time}</Text>
-        </View>
-      );
-    });
-  };
-
-  const renderWeatherIcon = (iconType, size = 40) => {
-    switch(iconType) {
-      case 'partly-cloudy':
-        return <PartlyCloudy size={size} />;
-      case 'light-rain':
-        return <LightRain size={size} />;
-      case 'heavy-rain':
-        return <HeavyRain size={size} />;
-      case 'thunderstorm':
-        return <Thunderstorm size={size} />;
-      case 'cloudy-night':
-        return <CloudyNight size={size} />;
-      default:
-        return <PartlyCloudy size={size} />;
-    }
-  };
-
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-    }
-  };
-
-  // Determine current weather icon based on condition
+  // Move helper functions inside the component
   const getMainWeatherIcon = () => {
     const condition = weatherData.condition.toLowerCase();
     
@@ -98,16 +39,26 @@ const WeatherDashboard = ({ onBack }) => {
       return <PartlyCloudy size={180} />;
     }
     
-    // Default
     return <CloudWithLightning size={180} />;
   };
 
-  return (
+  const renderWeatherIcon = (iconType, size = 40) => {
+    switch(iconType) {
+      case 'partly-cloudy': return <PartlyCloudy size={size} />;
+      case 'light-rain': return <LightRain size={size} />;
+      case 'heavy-rain': return <HeavyRain size={size} />;
+      case 'thunderstorm': return <Thunderstorm size={size} />;
+      case 'cloudy-night': return <CloudyNight size={size} />;
+      default: return <PartlyCloudy size={size} />;
+    }
+  };
+
+  const renderContent = () => (
     <View style={styles.container}>
       {/* Back Button */}
       <TouchableOpacity 
         style={styles.backButton} 
-        onPress={handleBack}
+        onPress={() => navigateTo('/')}
       >
         <Text style={styles.backButtonText}>←</Text>
       </TouchableOpacity>
@@ -204,12 +155,36 @@ const WeatherDashboard = ({ onBack }) => {
       </View>
 
       {/* Location Button */}
-      <TouchableOpacity style={styles.locationButton}>
+      <TouchableOpacity 
+        style={styles.locationButton} 
+        onPress={() => navigateTo('/maps-location')}
+      >
         <View style={styles.locationButtonBackground}>
           <Image source={mapPinIcon} style={styles.locationButtonIcon} />
         </View>
       </TouchableOpacity>
     </View>
+  );
+
+  return (
+    <>
+      <StatusBar
+        translucent={Platform.OS === 'ios'}
+        backgroundColor="#051B45"
+        barStyle="light-content"
+      />
+      {Platform.OS === 'ios' ? (
+        <View style={styles.absoluteFill}>
+          <SafeAreaView style={styles.iosContainer}>
+            {renderContent()}
+          </SafeAreaView>
+        </View>
+      ) : (
+        <View style={styles.androidContainer}>
+          {renderContent()}
+        </View>
+      )}
+    </>
   );
 };
 

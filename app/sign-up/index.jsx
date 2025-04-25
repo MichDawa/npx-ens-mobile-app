@@ -44,10 +44,10 @@ const SignUpPage = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => navigateTo('/maps-location')}
+          onPress={() => navigateTo('/location-form')}
         >
           <Text style={styles.buttonText}>
-            <Text style={styles.nextColor}>Sign Up</Text>
+            <Text style={styles.nextColor}>Next</Text>
           </Text>
         </TouchableOpacity>
       </View>

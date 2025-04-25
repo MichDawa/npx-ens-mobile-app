@@ -30,6 +30,14 @@ const StackNavigator = () => (
       name="maps-location/index"
       options={{ headerShown: false }}
     />
+    <Stack.Screen 
+      name="location-form/index"
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen 
+      name="dashboard/index"
+      options={{ headerShown: false }}
+    />
   </Stack>
 );
 

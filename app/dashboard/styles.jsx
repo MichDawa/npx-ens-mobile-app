@@ -3,8 +3,24 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#00295c', // Dark blue background
+    backgroundColor: '#051B45', // Updated to match requested color
     padding: 20,
+  },
+  absoluteFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#051B45',
+  },
+  iosContainer: {
+    flex: 1,
+    backgroundColor: '#051B45',
+  },
+  androidContainer: {
+    flex: 1,
+    backgroundColor: '#051B45',
   },
   backButton: {
     position: 'absolute',

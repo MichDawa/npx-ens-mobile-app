@@ -2,7 +2,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ipconfig in cmd to get the 192.168.254.107 instead of localhost
-const API_BASE_URL = 'http://192.168.254.107/ens-mobile-app-backend/public';
+// const API_BASE_URL = 'http://192.168.254.107/ens-mobile-app-backend/public';
+const API_BASE_URL = 'https://ens-mobile-app-backend-419947829015.us-central1.run.app';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

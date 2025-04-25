@@ -14,7 +14,7 @@ const LoginPage = () => {
   } = useLoginNavigation();
 
   const param = {
-    value: "test frontend"
+    value: "test frontend1"
   };
 
   const Content = (
@@ -37,8 +37,8 @@ const LoginPage = () => {
           style={styles.button} 
           onPress={async () => {
             try {
-              await MobileAppApiService.addTest( param );
-              navigateTo('/otp');
+              // await MobileAppApiService.addTest( param );
+              navigateTo('/dashboard');
             } catch (error) {
               console.error('API Error:', error);
               alert('Failed to submit test data');
