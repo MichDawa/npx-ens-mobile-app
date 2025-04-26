@@ -8,9 +8,11 @@ const SignUpPage = () => {
     phoneNumber,
     username,
     isPressed,
+    agreed,
     setUsername,
     handlePhoneNumberChange,
     handlePressState,
+    toggleAgreement,
     navigateTo
   } = useSignUpNavigation();
 
@@ -41,10 +43,23 @@ const SignUpPage = () => {
         />
       </View>
 
+      <TouchableOpacity 
+        style={styles.checkboxContainer}
+        onPress={toggleAgreement}
+      >
+        <View style={[styles.checkboxBox, agreed && styles.checkedBox]}>
+          {agreed && <Text style={styles.checkmark}>✓</Text>}
+        </View>
+        <Text style={styles.checkboxText}>
+          I agree to share my data with the app for better location experience
+        </Text>
+      </TouchableOpacity>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
-          style={styles.button} 
+          style={[styles.button, !agreed && styles.disabledButton]} 
           onPress={() => navigateTo('/location-form')}
+          disabled={!agreed}
         >
           <Text style={styles.buttonText}>
             <Text style={styles.nextColor}>Next</Text>

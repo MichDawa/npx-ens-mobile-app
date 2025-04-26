@@ -7,7 +7,7 @@ export default StyleSheet.create({
     overflow: 'visible',
   },
   header: {
-    height: 65,
+    height: height * 0.085,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

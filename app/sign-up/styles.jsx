@@ -81,4 +81,37 @@ export default StyleSheet.create({
     backgroundColor: '#F5FCFF',
     paddingHorizontal: Platform.OS === 'ios' ? 16 : 0,
   },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 15,
+    width: 300,
+  },
+  checkboxBox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#004AAD',
+    borderRadius: 4,
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkedBox: {
+    backgroundColor: '#004AAD',
+  },
+  checkmark: {
+    color: 'white',
+    fontSize: 14,
+  },
+  checkboxText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#004AAD',
+    fontFamily: 'Poppins-Regular',
+  },
+  disabledButton: {
+    backgroundColor: '#CCCCCC',
+    opacity: 0.7,
+  },
 });

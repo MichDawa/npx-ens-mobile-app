@@ -6,6 +6,11 @@ export const useSignUpNavigation = () => {
   const [phoneNumber, setPhoneNumber] = useState("+63 ");
   const [username, setUsername] = useState("");
   const [isPressed, setIsPressed] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+
+  const toggleAgreement = () => {
+    setAgreed(prev => !prev);
+  };
 
   const handlePhoneNumberChange = (newValue) => {
     if (!newValue.startsWith("+63 ")) return;
@@ -20,9 +25,11 @@ export const useSignUpNavigation = () => {
     phoneNumber,
     username,
     isPressed,
+    agreed,
     setUsername,
     handlePhoneNumberChange,
     handlePressState,
-    navigateTo
+    navigateTo,
+    toggleAgreement,
   };
 };
