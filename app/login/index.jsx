@@ -1,21 +1,23 @@
-import React, { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput, StatusBar, SafeAreaView, Platform } from "react-native";
 import styles from "./styles";
 import { useLoginNavigation } from "../../store/state/login-state";
-import sampleApiService from "../../services/mobile-app-api.service";
+import mobileAppApiService from "../../services/mobile-app-api.service";
 
 const LoginPage = () => {
   const {
     phoneNumber,
     isPressed,
+    isLogging,
+    setIsLogging,
+    loginApiResponse,
+    setLoginApiResponse,
     handlePhoneNumberChange,
     handlePressState,
     navigateTo
   } = useLoginNavigation();
 
-  const [isLogging, setIsLogging] = useState(false);
   const strippedPhoneNumber = phoneNumber.replace("+63 ", "");
-  const isPhoneValid = strippedPhoneNumber.length === 11;
+  const isPhoneValid = strippedPhoneNumber.length === 10;
   
   const loginApiCall = async () => {
     setIsLogging(true);
@@ -25,7 +27,9 @@ const LoginPage = () => {
       
       while (retries < 3 && !success) {
         try {
-          await sampleApiService.login({ phoneNumber: strippedPhoneNumber });
+          const response = await mobileAppApiService.login({ phoneNumber: strippedPhoneNumber });
+          setLoginApiResponse(response.data);
+          console.log('Login Success:', response.data);
           navigateTo('/dashboard');
           success = true;
         } catch (error) {
@@ -54,7 +58,7 @@ const LoginPage = () => {
           value={phoneNumber}
           onChangeText={handlePhoneNumberChange}
           keyboardType="phone-pad"
-          maxLength={15}
+          maxLength={14}
         />
       </View>
 

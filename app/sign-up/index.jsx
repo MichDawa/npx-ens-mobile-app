@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, TextInput, StatusBar, SafeAreaView, Platform } from "react-native";
 import { useSignUpNavigation } from "../../store/state/sign-up-state";
+import mobileAppApiService from "../../services/mobile-app-api.service";
 import styles from "./styles";
 
 const SignUpPage = () => {
@@ -8,6 +9,10 @@ const SignUpPage = () => {
     phoneNumber,
     username,
     isPressed,
+    isSigningUp,
+    setIsSigningUp,
+    signUpApiResponse,
+    setSignUpApiResponse,
     agreed,
     setUsername,
     handlePhoneNumberChange,
@@ -15,6 +20,28 @@ const SignUpPage = () => {
     toggleAgreement,
     navigateTo
   } = useSignUpNavigation();
+
+  const strippedPhoneNumber = phoneNumber.replace("+63 ", "");
+  const isPhoneValid = strippedPhoneNumber.length === 10;
+  const isUsernameValid = username.trim().length > 0;
+
+  const signUpApiCall = async () => {
+    setIsSigningUp(true);
+    try {
+      const response = await mobileAppApiService.signup({
+        phoneNumber: strippedPhoneNumber,
+        username: username.trim()
+      });
+      setSignUpApiResponse(response.data);
+      console.log('Signup Success:', response.data);
+      navigateTo('/location-form');
+    } catch (error) {
+      console.error('Signup Error:', error);
+      alert('Signup failed. Please try again.');
+    } finally {
+      setIsSigningUp(false);
+    }
+  };
 
   const Content = (
     <View style={styles.container}>
@@ -57,12 +84,14 @@ const SignUpPage = () => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
-          style={[styles.button, !agreed && styles.disabledButton]} 
-          onPress={() => navigateTo('/location-form')}
-          disabled={!agreed}
+          style={[styles.button, (!agreed || !isPhoneValid || !isUsernameValid || isSigningUp) && styles.disabledButton]} 
+          onPress={signUpApiCall}
+          disabled={!agreed || !isPhoneValid || !isUsernameValid || isSigningUp}
         >
           <Text style={styles.buttonText}>
-            <Text style={styles.nextColor}>Next</Text>
+            <Text style={styles.nextColor}>
+              {isSigningUp ? "Signing up..." : "Next"}
+            </Text>
           </Text>
         </TouchableOpacity>
       </View>

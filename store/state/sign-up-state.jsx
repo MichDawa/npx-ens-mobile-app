@@ -7,6 +7,8 @@ export const useSignUpNavigation = () => {
   const [username, setUsername] = useState("");
   const [isPressed, setIsPressed] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [signUpApiResponse, setSignUpApiResponse] = useState(null);
 
   const toggleAgreement = () => {
     setAgreed(prev => !prev);
@@ -25,6 +27,10 @@ export const useSignUpNavigation = () => {
     phoneNumber,
     username,
     isPressed,
+    isSigningUp,
+    setIsSigningUp,
+    signUpApiResponse,
+    setSignUpApiResponse,
     agreed,
     setUsername,
     handlePhoneNumberChange,

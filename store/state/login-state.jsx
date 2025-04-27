@@ -5,12 +5,14 @@ export const useLoginNavigation = () => {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("+63 ");
   const [isPressed, setIsPressed] = useState(false);
+  const [isLogging, setIsLogging] = useState(false);
+  const [loginApiResponse, setLoginApiResponse] = useState(null);
 
   const handlePhoneNumberChange = (newValue) => {
     if (!newValue.startsWith("+63 ")) return;
     
     const numbers = newValue.slice(4).replace(/[^0-9]/g, "");
-    if (numbers.length <= 11) {
+    if (numbers.length <= 10) {
       setPhoneNumber(`+63 ${numbers}`);
     }
   };
@@ -25,6 +27,10 @@ export const useLoginNavigation = () => {
   return {
     phoneNumber,
     isPressed,
+    isLogging,
+    setIsLogging,
+    loginApiResponse,
+    setLoginApiResponse,
     handlePhoneNumberChange,
     handlePressState,
     navigateTo
