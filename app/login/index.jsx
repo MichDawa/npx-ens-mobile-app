@@ -20,6 +20,7 @@ const LoginPage = () => {
   const isPhoneValid = strippedPhoneNumber.length === 10;
   
   const loginApiCall = async () => {
+    if (isLogging) return;
     setIsLogging(true);
     try {
       let retries = 0;

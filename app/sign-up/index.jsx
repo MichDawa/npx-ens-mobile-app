@@ -26,22 +26,39 @@ const SignUpPage = () => {
   const isUsernameValid = username.trim().length > 0;
 
   const signUpApiCall = async () => {
+    if (isSigningUp) return;
     setIsSigningUp(true);
+  
     try {
-      const response = await mobileAppApiService.signup({
-        phoneNumber: strippedPhoneNumber,
-        username: username.trim()
-      });
-      setSignUpApiResponse(response.data);
-      console.log('Signup Success:', response.data);
-      navigateTo('/location-form');
+      let retries = 0;
+      let success = false;
+  
+      while (retries < 3 && !success) {
+        try {
+          const response = await mobileAppApiService.signup({
+            phoneNumber: strippedPhoneNumber,
+            username: username.trim()
+          });
+  
+          setSignUpApiResponse(response.data);
+          console.log('Signup Success:', response.data);
+          
+          navigateTo('/location-form');
+          return;
+        } catch (error) {
+          retries++;
+          if (retries >= 3) {
+            throw error;
+          }
+        }
+      }
     } catch (error) {
-      console.error('Signup Error:', error);
+      console.error('API Error:', error);
       alert('Signup failed. Please try again.');
     } finally {
       setIsSigningUp(false);
     }
-  };
+  };  
 
   const Content = (
     <View style={styles.container}>
