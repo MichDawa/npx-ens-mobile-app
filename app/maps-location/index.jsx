@@ -58,7 +58,9 @@ const MapLocation = () => {
     showLegend, 
     setShowLegend,
     showEmergencyAlert,
-    setShowEmergencyAlert 
+    setShowEmergencyAlert,
+    emergencyCoordinates,
+    setEmergencyCoordinates
   } = useMapsUIState();
 
   const mapRef = useRef(null);
@@ -144,17 +146,28 @@ const MapLocation = () => {
     setPingConfirm(false);
     
     if (mapRef?.current && location?.coords) {
+      const currentCoords = {
+        lat: location.coords.latitude,
+        lng: location.coords.longitude
+      };
+      
       mapRef.current.animateToRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: currentCoords.lat,
+        longitude: currentCoords.lng,
         latitudeDelta: STANDARD_ZOOM.latitudeDelta * 0.2,
         longitudeDelta: STANDARD_ZOOM.longitudeDelta * 0.2,
       }, 1000);
   
       setTimeout(() => {
         setShowEmergencyAlert(true);
+        setEmergencyCoordinates(
+          `${currentCoords.lat.toFixed(6)}, ${currentCoords.lng.toFixed(6)}`
+        );
       }, 1000);
-    } else {
+    } else if (location?.coords) {
+      setEmergencyCoordinates(
+        `${location.coords.latitude.toFixed(6)}, ${location.coords.longitude.toFixed(6)}`
+      );
       setShowEmergencyAlert(true);
     }
   };

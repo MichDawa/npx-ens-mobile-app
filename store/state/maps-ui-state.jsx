@@ -4,6 +4,7 @@ const useMapsUIState = () => {
   const [pingConfirm, setPingConfirm] = useState(false);
   const [showLegend, setShowLegend] = useState(false);
   const [showEmergencyAlert, setShowEmergencyAlert] = useState(false);
+  const [emergencyCoordinates, setEmergencyCoordinates] = useState('');
 
   return {
     pingConfirm,
@@ -11,7 +12,9 @@ const useMapsUIState = () => {
     showLegend,
     setShowLegend,
     showEmergencyAlert,
-    setShowEmergencyAlert
+    setShowEmergencyAlert,
+    emergencyCoordinates,
+    setEmergencyCoordinates
   };
 };
 
