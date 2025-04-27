@@ -2,6 +2,9 @@ import React from "react";
 import { View, Text, TouchableOpacity, TextInput, StatusBar, SafeAreaView, Platform } from "react-native";
 import styles from "./styles";
 import { useLocationFormNavigation } from "../../store/state/location-form-state";
+import { useLocalSearchParams } from "expo-router";
+import { useSignUpNavigation } from "../../store/state/sign-up-state";
+import mobileAppApiService from "../../services/mobile-app-api.service";
 
 const LocationForm = () => {
   const {
@@ -19,8 +22,74 @@ const LocationForm = () => {
     setPostalCode,
     setCountry,
     handlePressState,
-    navigateTo
+    navigateTo,
+    isSubmitting,
+    setIsSubmitting,
   } = useLocationFormNavigation();
+
+  const { signUpApiResponse } = useSignUpNavigation();
+  const params = useLocalSearchParams();
+  const signUpData = signUpApiResponse || JSON.parse(params.signUpData);
+
+  const isFormValid = () => {
+    return (
+      address1.trim() !== '' &&
+      city.trim() !== '' &&
+      postalCode.trim() !== '' &&
+      country.trim() !== ''
+    );
+  };
+
+  const handleLocationSubmit = async () => {
+    if (!signUpData?.id) {
+      alert('Missing user information. Please complete signup first.');
+      navigateTo('/sign-up');
+      return;
+    }
+
+    if (isSubmitting || !isFormValid()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      console.log('Processed signUpData:', signUpData);
+      
+      const data = {
+        id: signUpData.id,
+        address1: address1.trim(),
+        address2: address2.trim(),
+        city: city.trim(),
+        zipcode: postalCode.trim(),
+        country: country.trim()
+      };
+
+      let retries = 0;
+      let success = false;
+      
+      while (retries < 3 && !success) {
+        try {
+          const response = await mobileAppApiService.location(data);
+          console.log('Location submitted:', response.data);
+          navigateTo('/dashboard');
+          success = true;
+          return;
+        } catch (error) {
+          retries++;
+          if (retries >= 3) {
+            throw error;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      alert('Failed to save address. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const Content = (
     <View style={styles.container}>
@@ -100,27 +169,20 @@ const LocationForm = () => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
-          style={styles.button} 
-          onPress={() => navigateTo('/maps-location')}
+          style={[
+            styles.button, 
+            (isSubmitting || !isFormValid()) && styles.disabledButton
+          ]} 
+          onPress={handleLocationSubmit}
+          disabled={isSubmitting || !isFormValid()}
         >
           <Text style={styles.buttonText}>
-            <Text style={styles.nextColor}>Sign Up</Text>
+            <Text style={styles.nextColor}>
+              {isSubmitting ? "Submitting..." : "Sign Up"}
+            </Text>
           </Text>
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        onPressIn={() => handlePressState(true)}
-        onPressOut={() => handlePressState(false)}
-        onPress={() => navigateTo('/login')}
-      >
-        <Text style={[
-          styles.loginSubtitle,
-          isPressed && styles.loginSubtitlePressed
-        ]}>
-          Already registered?{"\n"}Log in here
-        </Text>
-      </TouchableOpacity>
     </View>
   )
 

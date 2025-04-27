@@ -43,7 +43,10 @@ const SignUpPage = () => {
           setSignUpApiResponse(response.data);
           console.log('Signup Success:', response.data);
           
-          navigateTo('/location-form');
+          navigateTo({
+            pathname: '/location-form',
+            params: { signUpData: JSON.stringify(response.data) }
+          });
           return;
         } catch (error) {
           retries++;

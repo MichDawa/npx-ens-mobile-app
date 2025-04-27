@@ -10,6 +10,7 @@ export const useLocationFormNavigation = () => {
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('');
   const [isPressed, setIsPressed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePressState = (pressed) => setIsPressed(pressed);
   const navigateTo = (route) => router.push(route);
@@ -29,6 +30,8 @@ export const useLocationFormNavigation = () => {
     setPostalCode,
     setCountry,
     handlePressState,
-    navigateTo
+    navigateTo,
+    isSubmitting,
+    setIsSubmitting,
   };
 };
