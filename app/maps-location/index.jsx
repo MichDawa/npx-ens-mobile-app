@@ -32,12 +32,14 @@ import AlertMarkIcon from '../../assets/icons/alert-mark-icon';
 // state
 import useMapsLocationState from '../../store/state/maps-location-state';
 import useMapsUIState from '../../store/state/maps-ui-state';
+import { useDashboardState } from "../../store/state/dashboard-state";
 
 // others
 import Header from '../components/header/index';
 import MapPingDialog from '../components/ping-dialog/index';
 import MapLegendDialog from '../components/map-legend-dialog';
 import EmergencyAlertDialog from '../components/emergency-alert-dialog';
+import { useLocalSearchParams } from "expo-router";
 
 const STANDARD_ZOOM = {
   latitudeDelta: 0.05,
@@ -168,6 +170,10 @@ const MapLocation = () => {
     return null;
   };
 
+  const params = useLocalSearchParams();
+  const dashboardDataLogin = params.loginFormData ? params.loginFormData : null;
+
+  console.log('dashboardDataLogin', dashboardDataLogin);
   const renderContent = () => (
     <>
       <Header 

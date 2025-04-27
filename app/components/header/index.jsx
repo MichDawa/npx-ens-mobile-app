@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import styles from "./styles";
 import BackIcon from "../../../assets/icons/back-icon";
 import LegendIcon from "../../../assets/icons/legend-icon";
+import { useRouter } from 'expo-router';
 
 const { width, height } = Dimensions.get("window");
 
@@ -12,6 +13,10 @@ const Header = ({
   setPingConfirm, 
   red
 }) => {
+  const router = useRouter();
+
+  const navigateTo = (route) => router.push(route);
+
   return (
     <View style={styles.container}>
       <View 
@@ -21,7 +26,9 @@ const Header = ({
         ]}
       >
         <View style={styles.leftContainer}>
-          <BackIcon />
+          <TouchableOpacity onPress={() => navigateTo("/dashboard")}>
+            <BackIcon />
+          </TouchableOpacity>
           <Text style={styles.title}>Map</Text>
         </View>
         <TouchableOpacity

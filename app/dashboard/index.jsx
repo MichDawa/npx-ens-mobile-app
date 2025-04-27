@@ -9,9 +9,9 @@ import {
   CloudyNight 
 } from './WeatherIcons';
 import styles from './styles';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useDashboardState } from "../../store/state/dashboard-state";
-
+import { useLoginNavigation } from "../../store/state/login-state";
 
 // Import icons
 const floodIcon = require('../../assets/images/icons/flood.png');
@@ -22,7 +22,11 @@ const mapPinIcon = require('../../assets/images/map-pin.png');
 
 const WeatherDashboard = () => {
   const { weatherData, navigateTo } = useDashboardState();
+  const { loginApiResponse } = useLoginNavigation();
+  const params = useLocalSearchParams();
+  const loginFormData = loginApiResponse || params.loginApiResponse;
 
+  console.log('loginFormData', loginFormData);
   // Move helper functions inside the component
   const getMainWeatherIcon = () => {
     const condition = weatherData.condition.toLowerCase();
@@ -157,7 +161,12 @@ const WeatherDashboard = () => {
       {/* Location Button */}
       <TouchableOpacity 
         style={styles.locationButton} 
-        onPress={() => navigateTo('/maps-location')}
+        onPress={() => navigateTo({
+          pathname: '/maps-location',
+          params: { 
+            loginFormData
+          }
+        })}
       >
         <View style={styles.locationButtonBackground}>
           <Image source={mapPinIcon} style={styles.locationButtonIcon} />

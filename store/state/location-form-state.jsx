@@ -11,6 +11,7 @@ export const useLocationFormNavigation = () => {
   const [country, setCountry] = useState('');
   const [isPressed, setIsPressed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [locationFormData, setLocationFormData] = useState(null);
 
   const handlePressState = (pressed) => setIsPressed(pressed);
   const navigateTo = (route) => router.push(route);
@@ -33,5 +34,7 @@ export const useLocationFormNavigation = () => {
     navigateTo,
     isSubmitting,
     setIsSubmitting,
+    locationFormData,
+    setLocationFormData,
   };
 };

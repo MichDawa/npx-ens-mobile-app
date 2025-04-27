@@ -25,6 +25,8 @@ const LocationForm = () => {
     navigateTo,
     isSubmitting,
     setIsSubmitting,
+    locationFormData,
+    setLocationFormData,
   } = useLocationFormNavigation();
 
   const { signUpApiResponse } = useSignUpNavigation();
@@ -72,8 +74,14 @@ const LocationForm = () => {
       while (retries < 3 && !success) {
         try {
           const response = await mobileAppApiService.location(data);
+
+          setLocationFormData(response.data);
           console.log('Location submitted:', response.data);
-          navigateTo('/dashboard');
+
+          navigateTo({
+            pathname: '/login',
+            params: { locationFormData: JSON.stringify(response.data) }
+          });
           success = true;
           return;
         } catch (error) {

@@ -21,7 +21,11 @@ export const useLoginNavigation = () => {
 
   const navigateTo = (route) => {
     router.push(route);
-    console.log(`Navigating to ${route}`);
+    if (typeof route === 'object') {
+      console.log(`Navigating to ${route.pathname}`, route.params ? route.params : '');
+    } else {
+      console.log(`Navigating to ${route}`);
+    }
   };
 
   return {

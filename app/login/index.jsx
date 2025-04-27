@@ -31,7 +31,10 @@ const LoginPage = () => {
           const response = await mobileAppApiService.login({ phoneNumber: strippedPhoneNumber });
           setLoginApiResponse(response.data);
           console.log('Login Success:', response.data);
-          navigateTo('/dashboard');
+          navigateTo({
+            pathname: '/dashboard',
+            params: { loginApiResponse: JSON.stringify(response.data) }
+          });
           success = true;
         } catch (error) {
           retries++;
