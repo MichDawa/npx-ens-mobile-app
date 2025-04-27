@@ -81,4 +81,8 @@ export default StyleSheet.create({
     backgroundColor: '#F5FCFF',
     paddingHorizontal: Platform.OS === 'ios' ? 16 : 0,
   },
+  disabledButton: {
+    backgroundColor: '#CCCCCC',
+    opacity: 0.7,
+  },
 });

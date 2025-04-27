@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput, StatusBar, SafeAreaView, Platform } from "react-native";
 import styles from "./styles";
 import { useLoginNavigation } from "../../store/state/login-state";
-import MobileAppApiService from "../../services/mobile-app-api.service";
+import sampleApiService from "../../services/mobile-app-api.service";
 
 const LoginPage = () => {
   const {
@@ -13,8 +13,34 @@ const LoginPage = () => {
     navigateTo
   } = useLoginNavigation();
 
-  const param = {
-    value: "test frontend1"
+  const [isLogging, setIsLogging] = useState(false);
+  const strippedPhoneNumber = phoneNumber.replace("+63 ", "");
+  const isPhoneValid = strippedPhoneNumber.length === 11;
+  
+  const loginApiCall = async () => {
+    setIsLogging(true);
+    try {
+      let retries = 0;
+      let success = false;
+      
+      while (retries < 3 && !success) {
+        try {
+          await sampleApiService.login({ phoneNumber: strippedPhoneNumber });
+          navigateTo('/dashboard');
+          success = true;
+        } catch (error) {
+          retries++;
+          if (retries >= 3) {
+            throw error;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      alert('Failed to login, please try again');
+    } finally {
+      setIsLogging(false);
+    }
   };
 
   const Content = (
@@ -28,25 +54,20 @@ const LoginPage = () => {
           value={phoneNumber}
           onChangeText={handlePhoneNumberChange}
           keyboardType="phone-pad"
-          maxLength={14}
+          maxLength={15}
         />
       </View>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
-          style={styles.button} 
-          onPress={async () => {
-            try {
-              // await MobileAppApiService.addTest( param );
-              navigateTo('/dashboard');
-            } catch (error) {
-              console.error('API Error:', error);
-              alert('Failed to submit test data');
-            }
-          }}
+          style={[styles.button, (isLogging || !isPhoneValid) && styles.disabledButton]} 
+          onPress={loginApiCall}
+          disabled={isLogging || !isPhoneValid}
         >
           <Text style={styles.buttonText}>
-            <Text style={styles.nextColor}>Next</Text>
+            <Text style={styles.nextColor}>
+              {isLogging ? "Logging in..." : "Next"}
+            </Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -64,7 +85,7 @@ const LoginPage = () => {
         </Text>
       </TouchableOpacity>
     </View>
-  )
+  );
 
   return (
     <>
@@ -77,7 +98,7 @@ const LoginPage = () => {
         {Platform.OS === "ios" ? (
           <SafeAreaView style={styles.iosSafeArea}>
             {Content}
-            </SafeAreaView>
+          </SafeAreaView>
         ) : (
           Content
         )}

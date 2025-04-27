@@ -10,7 +10,7 @@ export const useLoginNavigation = () => {
     if (!newValue.startsWith("+63 ")) return;
     
     const numbers = newValue.slice(4).replace(/[^0-9]/g, "");
-    if (numbers.length <= 10) {
+    if (numbers.length <= 11) {
       setPhoneNumber(`+63 ${numbers}`);
     }
   };

@@ -23,10 +23,6 @@ const StackNavigator = () => (
       options={{ headerShown: false }}
     />
     <Stack.Screen 
-      name="otp/index"
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen 
       name="maps-location/index"
       options={{ headerShown: false }}
     />
