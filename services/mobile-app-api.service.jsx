@@ -5,6 +5,7 @@ const mobileAppApiService = {
   login: (data) => api.post('/app/login', data),
   signup: (data) => api.post('/app/signup', data),
   location: (data) => api.post('/app/inputlocation', data),
+  location: (data) => api.post('/app/pinglocation', data),
 
   get: (endpoint) => api.get(endpoint),
   post: (endpoint, data) => api.post(endpoint, data),

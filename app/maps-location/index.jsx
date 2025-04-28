@@ -32,14 +32,14 @@ import AlertMarkIcon from '../../assets/icons/alert-mark-icon';
 // state
 import useMapsLocationState from '../../store/state/maps-location-state';
 import useMapsUIState from '../../store/state/maps-ui-state';
-import { useDashboardState } from "../../store/state/dashboard-state";
 
 // others
 import Header from '../components/header/index';
 import MapPingDialog from '../components/ping-dialog/index';
 import MapLegendDialog from '../components/map-legend-dialog';
 import EmergencyAlertDialog from '../components/emergency-alert-dialog';
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import mobileAppApiService from "../../services/mobile-app-api.service";
 
 const STANDARD_ZOOM = {
   latitudeDelta: 0.05,
@@ -65,6 +65,7 @@ const MapLocation = () => {
 
   const mapRef = useRef(null);
   const timeoutRef = useRef(null);
+  const router = useRouter();
 
   const [isPingDialogMounted, setIsPingDialogMounted] = useState(false);
   const pingConfirmOpacity = useRef(new Animated.Value(0)).current;
@@ -137,18 +138,32 @@ const MapLocation = () => {
       timeoutRef.current = setTimeout(() => {
         setShowEmergencyAlert(false);
         // setTimeout(() => setPingConfirm(true), 300);
-      }, 3000);
+      }, 10000);
     }
     return () => clearTimeout(timeoutRef.current);
   }, [showEmergencyAlert]);
 
   useEffect(() => {
+    const sendEmergencyLocation = async (id, coordinates) => {
+    try {
+      const response = await mobileAppApiService.location({
+        id: id,
+        exactLocation: coordinates
+      });
+      console.log('Emergency location pinged successfully:', response.data);
+    } catch (error) {
+      console.error('API Error:', error);
+      router.replace('/login');
+    }
+  };
+
     if (showEmergencyAlert) {
       const userData = JSON.parse(dashboardDataLogin);
-      console.log('Emergency Coordinates:', emergencyCoordinates);
-      console.log('id', userData.id);
+      if (userData?.id && emergencyCoordinates) {
+        sendEmergencyLocation(userData.id, emergencyCoordinates);
+      }
     }
-  }, [showEmergencyAlert]);
+  }, [showEmergencyAlert, emergencyCoordinates, dashboardDataLogin]);
 
   const handleYesPress = () => {
     setPingConfirm(false);
