@@ -142,6 +142,14 @@ const MapLocation = () => {
     return () => clearTimeout(timeoutRef.current);
   }, [showEmergencyAlert]);
 
+  useEffect(() => {
+    if (showEmergencyAlert) {
+      const userData = JSON.parse(dashboardDataLogin);
+      console.log('Emergency Coordinates:', emergencyCoordinates);
+      console.log('id', userData.id);
+    }
+  }, [showEmergencyAlert]);
+
   const handleYesPress = () => {
     setPingConfirm(false);
     
