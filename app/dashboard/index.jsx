@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, Platform, StatusBar, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image, Platform, StatusBar, SafeAreaView, ActivityIndicator, RefreshControl } from 'react-native';
 import { 
   CloudWithLightning, 
   PartlyCloudy, 
@@ -21,12 +21,12 @@ const windIcon = require('../../assets/images/icons/winds.png');
 const mapPinIcon = require('../../assets/images/map-pin.png');
 
 const WeatherDashboard = () => {
-  const { weatherData, navigateTo } = useDashboardState();
+  const { weatherData, loading, error, refreshWeather, navigateTo, setSelectedStats } = useDashboardState();
   const { loginApiResponse } = useLoginNavigation();
   const params = useLocalSearchParams();
   const loginFormData = loginApiResponse || params.loginApiResponse;
+  const [selectedForecastIndex, setSelectedForecastIndex] = useState(0);
 
-  console.log('loginFormData', loginFormData);
   // Move helper functions inside the component
   const getMainWeatherIcon = () => {
     const condition = weatherData.condition.toLowerCase();
@@ -40,6 +40,10 @@ const WeatherDashboard = () => {
     }
     
     if (condition.includes('cloud')) {
+      return <PartlyCloudy size={180} />;
+    }
+    
+    if (condition.includes('sunny')) {
       return <PartlyCloudy size={180} />;
     }
     
@@ -57,8 +61,26 @@ const WeatherDashboard = () => {
     }
   };
 
+  // Select a forecast and update its stats
+  const handleForecastSelect = (forecast, index) => {
+    setSelectedForecastIndex(index);
+    if (forecast.stats) {
+      setSelectedStats(forecast.stats);
+    }
+  };
+
   const renderContent = () => (
-    <View style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading}
+          onRefresh={refreshWeather}
+          colors={['#fff']}
+          tintColor="#fff"
+        />
+      }
+    >
       {/* Back Button */}
       <TouchableOpacity 
         style={styles.backButton} 
@@ -69,37 +91,62 @@ const WeatherDashboard = () => {
       
       {/* Location and Date - Updated to match the image */}
       <View style={styles.header}>
-        <Text style={styles.locationName}>Surigao,</Text>
-        <Text style={styles.countryName}>Philippines</Text>
+        {loading && !weatherData.location ? (
+          <Text style={styles.locationName}>Loading location...</Text>
+        ) : (
+          <>
+            {weatherData.location.includes(',') ? (
+              <>
+                <Text style={styles.locationName}>{weatherData.location.split(',')[0]},</Text>
+                <Text style={styles.countryName}>{weatherData.location.split(',')[1].trim()}</Text>
+              </>
+            ) : (
+              <Text style={styles.locationName}>{weatherData.location}</Text>
+            )}
+          </>
+        )}
         <Text style={styles.date}>{weatherData.date}</Text>
       </View>
 
       {/* Main Weather Display */}
       <View style={styles.mainWeather}>
-        <View style={styles.weatherDisplay}>
-          {/* Weather Icon - 50% width */}
-          <View style={styles.weatherIconContainer}>
-            <View style={styles.weatherIconLarge}>
-              {getMainWeatherIcon()}
-            </View>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#fff" />
           </View>
-          
-          {/* Temperature Section - 50% width */}
-          <View style={styles.temperatureContainer}>
-            <View style={styles.tempSection}>
-              <View style={styles.tempContainer}>
-                <View style={styles.temperatureWrapper}>
-                  <Text style={styles.temperature}>{weatherData.temperature}</Text>
-                  <View style={styles.conditionContainer}>
-                    <Text style={styles.condition}>{weatherData.condition}</Text>
+        ) : (
+          <View style={styles.weatherDisplay}>
+            {/* Weather Icon - 50% width */}
+            <View style={styles.weatherIconContainer}>
+              <View style={styles.weatherIconLarge}>
+                {getMainWeatherIcon()}
+              </View>
+            </View>
+            
+            {/* Temperature Section - 50% width */}
+            <View style={styles.temperatureContainer}>
+              <View style={styles.tempSection}>
+                <View style={styles.tempContainer}>
+                  <View style={styles.temperatureWrapper}>
+                    <Text style={styles.temperature}>{weatherData.temperature}</Text>
+                    <View style={styles.conditionContainer}>
+                      <Text style={styles.condition}>{weatherData.condition}</Text>
+                    </View>
                   </View>
+                  <Text style={styles.degreeSymbol}>°C</Text>
                 </View>
-                <Text style={styles.degreeSymbol}>°C</Text>
               </View>
             </View>
           </View>
-        </View>
+        )}
       </View>
+
+      {/* Error message if needed */}
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
 
       {/* Flood Risk Indicator - Updated to match image */}
       <View style={styles.riskContainer}>
@@ -132,26 +179,54 @@ const WeatherDashboard = () => {
       <View style={styles.hourlyForecastContainer}>
         <View style={styles.hourlyForecastHeader}>
           <Text style={styles.hourlyForecastTitle}>Today</Text>
-          <Text style={styles.hourlyForecastDate}>Mar, 9</Text>
+          <Text style={styles.hourlyForecastDate}>
+            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          </Text>
         </View>
         <View style={styles.hourlyForecastContent}>
           <View style={styles.hourlyForecastCards}>
             {weatherData.hourlyForecast.map((hour, index) => {
-              const isActive = hour.time === '17.00';
+              // Parse time from the forecast (e.g., "15.00" to get 15)
+              const hourValue = parseInt(hour.time.split('.')[0]);
+              
+              // Get current hour
+              const currentHour = new Date().getHours();
+              
+              // Calculate closest hour (accounting for hour wrapping at 24)
+              let closestHourIndex = 0;
+              let smallestDiff = 24;
+              
+              weatherData.hourlyForecast.forEach((forecast, idx) => {
+                const forecastHour = parseInt(forecast.time.split('.')[0]);
+                // Calculate hour difference accounting for day wrapping
+                let diff = Math.abs(forecastHour - currentHour);
+                if (diff > 12) diff = 24 - diff;
+                
+                if (diff < smallestDiff) {
+                  smallestDiff = diff;
+                  closestHourIndex = idx;
+                }
+              });
+              
+              // Highlight the selected forecast or the closest to current time
+              const isActive = index === selectedForecastIndex || 
+                (selectedForecastIndex === null && index === closestHourIndex);
+              
               return (
-                <View 
+                <TouchableOpacity 
                   key={index} 
                   style={[
                     styles.hourlyForecastCard,
                     isActive && styles.hourlyForecastCardActive
                   ]}
+                  onPress={() => handleForecastSelect(hour, index)}
                 >
                   <Text style={styles.hourlyForecastTemp}>{hour.temp}</Text>
                   <View style={styles.hourlyForecastIconContainer}>
-                    {renderWeatherIcon(hour.icon, 100)}
+                    {renderWeatherIcon(hour.icon, 60)}
                   </View>
                   <Text style={styles.hourlyForecastTime}>{hour.time}</Text>
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>
@@ -172,7 +247,7 @@ const WeatherDashboard = () => {
           <Image source={mapPinIcon} style={styles.locationButtonIcon} />
         </View>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 
   return (

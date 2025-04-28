@@ -18,8 +18,9 @@ import { Svg, Image as ImageSvg } from 'react-native-svg';
 // styles and assets
 import styles from './styles';
 import mapStyle from '../../assets/map-styles';
-import evacuationCenters from '../../assets/evacuation-centers';
-import closedRoads from '../../assets/closed-roads';
+// Removing the direct imports in favor of API calls
+// import evacuationCenters from '../../assets/evacuation-centers';
+// import closedRoads from '../../assets/closed-roads';
 
 // icons
 import LocationIcon from '../../assets/icons/location-icon';
@@ -67,6 +68,10 @@ const MapLocation = () => {
   const timeoutRef = useRef(null);
   const router = useRouter();
 
+  const [evacuationCenters, setEvacuationCenters] = useState([]);
+  const [closedRoads, setClosedRoads] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [isPingDialogMounted, setIsPingDialogMounted] = useState(false);
   const pingConfirmOpacity = useRef(new Animated.Value(0)).current;
 
@@ -75,6 +80,76 @@ const MapLocation = () => {
 
   const [isEmergencyMounted, setIsEmergencyMounted] = useState(false);
   const emergencyOpacity = useRef(new Animated.Value(0)).current;
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [centersResponse, roadsResponse] = await Promise.all([
+        mobileAppApiService.getEvacuationCenters(),
+        mobileAppApiService.getClosedRoads()
+      ]);
+      
+      console.log('Evacuation centers response:', centersResponse);
+      console.log('Closed roads response:', roadsResponse);
+      
+      const centersData = centersResponse?.data || [];
+      const roadsData = roadsResponse?.data || [];
+      
+      if (Array.isArray(centersData)) {
+        console.log(`Got ${centersData.length} evacuation centers`);
+        const transformedCenters = centersData.map(center => ({
+          id: center.id,
+          title: center.title,
+          coordinate: { 
+            latitude: Number(center.latitude), 
+            longitude: Number(center.longitude) 
+          },
+          descriptionAndroid: center.description,
+          descriptionIOS: center.descriptionImage
+        }));
+        console.log('Transformed centers:', transformedCenters);
+        setEvacuationCenters(transformedCenters);
+      } else {
+        console.error('Invalid evacuation centers data format:', centersData);
+        setEvacuationCenters([]);
+      }
+      
+      if (Array.isArray(roadsData)) {
+        console.log(`Got ${roadsData.length} closed roads`);
+        const transformedRoads = roadsData.map(road => ({
+          id: road.id,
+          title: road.title,
+          coordinate: { 
+            latitude: Number(road.latitude), 
+            longitude: Number(road.longitude) 
+          },
+          description: road.description || 'Road Closed'
+        }));
+        console.log('Transformed roads:', transformedRoads);
+        setClosedRoads(transformedRoads);
+      } else {
+        console.error('Invalid closed roads data format:', roadsData);
+        setClosedRoads([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch map data:', error);
+      import('../../assets/evacuation-centers').then(module => {
+        console.log('Using fallback evacuation centers data');
+        setEvacuationCenters(module.default);
+      }).catch(err => console.error('Failed to load fallback evacuation centers:', err));
+      
+      import('../../assets/closed-roads').then(module => {
+        console.log('Using fallback closed roads data');
+        setClosedRoads(module.default);
+      }).catch(err => console.error('Failed to load fallback closed roads:', err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (pingConfirm) {
@@ -146,7 +221,7 @@ const MapLocation = () => {
   useEffect(() => {
     const sendEmergencyLocation = async (id, coordinates) => {
     try {
-      const response = await mobileAppApiService.location({
+      const response = await mobileAppApiService.pinglocation({
         id: id,
         exactLocation: coordinates
       });
@@ -273,47 +348,131 @@ const MapLocation = () => {
           )
         )}
 
-        {evacuationCenters.map((center) => (
-          <Marker
-            key={center.id}
-            coordinate={center.coordinate}
-            title={center.title}
-            description={center.descriptionAndroid}
-            anchor={{ x: 0.5, y: 1 }}
-          >
-            <LandmarkIcon width={50} height={50} />
-            {Platform.OS === "ios" && (
-              <Callout tooltip style={styles.customCallout}>
-                <View style={styles.calloutContainer}>
-                  <View style={styles.calloutRow}>
-                    <SmallLandmarkIcon width={20} height={20} style={styles.icon} />
-                    <Text style={styles.calloutTitle}>{center.title}</Text>
+        {!loading && evacuationCenters && evacuationCenters.map((center) => {
+          // Validate the center data has required properties
+          if (!center || !center.coordinate) {
+            console.error('Missing coordinate data for evacuation center:', center);
+            return null;
+          }
+          
+          // Validate coordinates are valid numbers and within reasonable range
+          const lat = Number(center.coordinate.latitude);
+          const lng = Number(center.coordinate.longitude);
+          
+          if (isNaN(lat) || isNaN(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            console.error(`Invalid coordinates for evacuation center: ${center.title}, lat: ${lat}, lng: ${lng}`);
+            return null;
+          }
+          
+          console.log(`Rendering evacuation center: ${center.title} at ${lat},${lng}`);
+          
+          return (
+            <Marker
+              key={center.id || `evacuation-${center.title}`}
+              coordinate={{
+                latitude: lat,
+                longitude: lng
+              }}
+              title={center.title || 'Evacuation Center'}
+              description={center.descriptionAndroid || ''}
+              anchor={{ x: 0.5, y: 1 }}
+            >
+              <LandmarkIcon width={50} height={50} />
+              {Platform.OS === "ios" && (
+                <Callout tooltip style={styles.customCallout}>
+                  <View style={styles.calloutContainer}>
+                    <View style={styles.calloutRow}>
+                      <SmallLandmarkIcon width={20} height={20} style={styles.icon} />
+                      <Text style={styles.calloutTitle}>{center.title || 'Evacuation Center'}</Text>
+                    </View>
+                    {center.descriptionIOS && (
+                      <Svg width={240} height={120}>
+                        <ImageSvg
+                          width="100%"
+                          height="100%"
+                          preserveAspectRatio="xMidYMid slice"
+                          href={{ uri: center.descriptionIOS }}
+                        />
+                      </Svg>
+                    )}
                   </View>
-                  <Svg width={240} height={120}>
-                    <ImageSvg
-                      width="100%"
-                      height="100%"
-                      preserveAspectRatio="xMidYMid slice"
-                      href={{ uri: center.descriptionIOS }}
-                    />
-                  </Svg>
-                </View>
-              </Callout>
-            )}
-          </Marker>
-        ))}
+                </Callout>
+              )}
+            </Marker>
+          );
+        })}
 
-        {closedRoads.map((road) => (
+        {!loading && closedRoads && closedRoads.map((road) => {
+          // Validate the road data has required properties
+          if (!road || !road.coordinate) {
+            console.error('Missing coordinate data for closed road:', road);
+            return null;
+          }
+          
+          // Validate coordinates are valid numbers and within reasonable range
+          const lat = Number(road.coordinate.latitude);
+          const lng = Number(road.coordinate.longitude);
+          
+          if (isNaN(lat) || isNaN(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+            console.error(`Invalid coordinates for closed road: ${road.title}, lat: ${lat}, lng: ${lng}`);
+            return null;
+          }
+          
+          console.log(`Rendering closed road: ${road.title} at ${lat},${lng}`);
+          
+          return (
+            <Marker
+              key={road.id || `road-${road.title}`}
+              coordinate={{
+                latitude: lat,
+                longitude: lng
+              }}
+              title={road.title || 'Closed Road'}
+              description={road.description || ''}
+              anchor={{ x: 0.5, y: 1 }}
+            >
+              <ClosedRoadIcon width={50} height={50} />
+            </Marker>
+          );
+        })}
+        
+        {loading && location?.coords && (
           <Marker
-            key={road.id}
-            coordinate={road.coordinate}
-            title={road.title}
-            description={road.description}
+            coordinate={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }}
             anchor={{ x: 0.5, y: 1 }}
           >
-            <ClosedRoadIcon width={50} height={50} />
+            <View style={styles.loadingMarker}>
+              <ActivityIndicator size="small" color="#ffffff" />
+              <Text style={styles.loadingMarkerText}>Loading map data...</Text>
+            </View>
           </Marker>
-        ))}
+        )}
+
+        {!loading && (!evacuationCenters || evacuationCenters.length === 0) && (!closedRoads || closedRoads.length === 0) && location?.coords && (
+          <Marker
+            coordinate={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }}
+            anchor={{ x: 0.5, y: 1 }}
+          >
+            <View style={styles.warningMarker}>
+              <Text style={styles.warningMarkerText}>No map data available</Text>
+              <TouchableOpacity 
+                style={styles.retryButton}
+                onPress={() => {
+                  setLoading(true);
+                  fetchData();
+                }}
+              >
+                <Text style={styles.retryButtonText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          </Marker>
+        )}
       </MapView>
 
       {!showEmergencyAlert && (

@@ -5,8 +5,11 @@ const mobileAppApiService = {
   login: (data) => api.post('/app/login', data),
   signup: (data) => api.post('/app/signup', data),
   location: (data) => api.post('/app/inputlocation', data),
-  location: (data) => api.post('/app/pinglocation', data),
-
+  pinglocation: (data) => api.post('/app/pinglocation', data),
+  weather: (locationData) => api.post('/app/weather', locationData),
+  getEvacuationCenters: () => api.get('/web/getevacuationcenters'),
+  getClosedRoads: () => api.get('/web/getclosedroads'),
+  
   get: (endpoint) => api.get(endpoint),
   post: (endpoint, data) => api.post(endpoint, data),
   postFile: (endpoint, formData) => api.post(endpoint, formData, {

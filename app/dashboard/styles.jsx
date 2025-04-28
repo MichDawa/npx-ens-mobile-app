@@ -64,6 +64,22 @@ const styles = StyleSheet.create({
   mainWeather: {
     marginTop: 10,
   },
+  loadingContainer: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(237, 85, 59, 0.6)',
+    borderRadius: 8,
+    padding: 10,
+    marginVertical: 10,
+  },
+  errorText: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: 'center',
+  },
   weatherDisplay: {
     flexDirection: 'row',
     marginBottom: 20,
@@ -95,6 +111,7 @@ const styles = StyleSheet.create({
   },
   temperatureWrapper: {
     alignItems: 'center',
+    marginTop: -20,
   },
   temperature: {
     fontSize: 90,
@@ -103,7 +120,7 @@ const styles = StyleSheet.create({
   },
   conditionContainer: {
     position: 'absolute',
-    bottom: -25,
+    bottom: -40,
     width: '100%',
     alignItems: 'center',
   },
