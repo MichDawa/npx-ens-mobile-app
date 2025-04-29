@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, Platform, StatusBar, SafeAreaView, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Platform, StatusBar, SafeAreaView, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { 
   CloudWithLightning, 
   PartlyCloudy, 
@@ -12,6 +12,7 @@ import styles from './styles';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useDashboardState } from "../../store/state/dashboard-state";
 import { useLoginNavigation } from "../../store/state/login-state";
+import hardwareData from "../../assets/hardware-data";
 
 // Import icons
 const floodIcon = require('../../assets/images/icons/flood.png');
@@ -19,6 +20,33 @@ const rainDropsIcon = require('../../assets/images/icons/rain-drops.png');
 const temperatureIcon = require('../../assets/images/icons/temperature.png');
 const windIcon = require('../../assets/images/icons/winds.png');
 const mapPinIcon = require('../../assets/images/map-pin.png');
+const warningIcon = require('../../assets/images/icons/flood.png');
+
+// FloodWarning component
+const FloodWarning = ({ data }) => {
+  // Find the highest risk area from hardware data
+  const highRiskArea = data.find(area => area.sensorValue === "HIGH RISK") || data[0];
+  
+  return (
+    <View style={styles.floodWarning.container}>
+      <View style={styles.floodWarning.header}>
+        <View style={styles.floodWarning.titleContainer}>
+          <Image source={warningIcon} style={styles.floodWarning.warningIcon} />
+          <Text style={styles.floodWarning.title}>Flood Possibility Warning</Text>
+        </View>
+        <Text style={styles.floodWarning.time}>
+          {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+        </Text>
+      </View>
+      <View style={styles.floodWarning.body}>
+        <Text style={styles.floodWarning.message}>
+          <Text style={{fontWeight: 'bold'}}>{highRiskArea.location}</Text> is at high flood risk, with water levels rising and impact expected in 1 hour. 
+          Residents should seek shelter at the nearest evacuation center and avoid other flooded areas near you.
+        </Text>
+      </View>
+    </View>
+  );
+};
 
 const WeatherDashboard = () => {
   const { weatherData, loading, error, refreshWeather, navigateTo, setSelectedStats } = useDashboardState();
@@ -81,7 +109,6 @@ const WeatherDashboard = () => {
         />
       }
     >
-      {/* Back Button */}
       <TouchableOpacity 
         style={styles.backButton} 
         onPress={() => navigateTo('/')}
@@ -89,7 +116,6 @@ const WeatherDashboard = () => {
         <Text style={styles.backButtonText}>←</Text>
       </TouchableOpacity>
       
-      {/* Location and Date - Updated to match the image */}
       <View style={styles.header}>
         {loading && !weatherData.location ? (
           <Text style={styles.locationName}>Loading location...</Text>
@@ -108,7 +134,6 @@ const WeatherDashboard = () => {
         <Text style={styles.date}>{weatherData.date}</Text>
       </View>
 
-      {/* Main Weather Display */}
       <View style={styles.mainWeather}>
         {loading ? (
           <View style={styles.loadingContainer}>
@@ -116,14 +141,12 @@ const WeatherDashboard = () => {
           </View>
         ) : (
           <View style={styles.weatherDisplay}>
-            {/* Weather Icon - 50% width */}
             <View style={styles.weatherIconContainer}>
               <View style={styles.weatherIconLarge}>
                 {getMainWeatherIcon()}
               </View>
             </View>
             
-            {/* Temperature Section - 50% width */}
             <View style={styles.temperatureContainer}>
               <View style={styles.tempSection}>
                 <View style={styles.tempContainer}>
@@ -141,12 +164,13 @@ const WeatherDashboard = () => {
         )}
       </View>
 
-      {/* Error message if needed */}
       {error && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
+
+      <FloodWarning data={hardwareData} />
 
       {/* Flood Risk Indicator - Updated to match image */}
       <View style={styles.riskContainer}>
@@ -175,7 +199,6 @@ const WeatherDashboard = () => {
         </View>
       </View>
 
-      {/* Hourly Forecast - Redesigned to match the image */}
       <View style={styles.hourlyForecastContainer}>
         <View style={styles.hourlyForecastHeader}>
           <Text style={styles.hourlyForecastTitle}>Today</Text>
@@ -186,19 +209,15 @@ const WeatherDashboard = () => {
         <View style={styles.hourlyForecastContent}>
           <View style={styles.hourlyForecastCards}>
             {weatherData.hourlyForecast.map((hour, index) => {
-              // Parse time from the forecast (e.g., "15.00" to get 15)
               const hourValue = parseInt(hour.time.split('.')[0]);
               
-              // Get current hour
               const currentHour = new Date().getHours();
               
-              // Calculate closest hour (accounting for hour wrapping at 24)
               let closestHourIndex = 0;
               let smallestDiff = 24;
               
               weatherData.hourlyForecast.forEach((forecast, idx) => {
                 const forecastHour = parseInt(forecast.time.split('.')[0]);
-                // Calculate hour difference accounting for day wrapping
                 let diff = Math.abs(forecastHour - currentHour);
                 if (diff > 12) diff = 24 - diff;
                 
@@ -208,7 +227,6 @@ const WeatherDashboard = () => {
                 }
               });
               
-              // Highlight the selected forecast or the closest to current time
               const isActive = index === selectedForecastIndex || 
                 (selectedForecastIndex === null && index === closestHourIndex);
               
@@ -233,7 +251,6 @@ const WeatherDashboard = () => {
         </View>
       </View>
 
-      {/* Location Button */}
       <TouchableOpacity 
         style={styles.locationButton} 
         onPress={() => navigateTo({

@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#051B45', // Updated to match requested color
+    backgroundColor: '#051B45',
     padding: 20,
   },
   absoluteFill: {
@@ -313,6 +313,65 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     tintColor: 'white',
+  },
+  floodWarning: {
+    container: {
+      width: '100%',
+      minHeight: 116,
+      marginBottom: 1,
+      borderRadius: 20,
+      overflow: 'hidden',
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      height: 34,
+      backgroundColor: '#F39C12',
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      paddingHorizontal: 10,
+    },
+    titleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    title: {
+      fontWeight: '700',
+      fontSize: 14,
+      color: '#FFFFFF',
+      marginLeft: 5,
+      flex: 1,
+    },
+    time: {
+      fontSize: 12,
+      color: '#FFFFFF',
+      marginLeft: 'auto',
+    },
+    warningIcon: {
+      width: 24,
+      height: 22,
+      tintColor: '#FFFFFF',
+    },
+    infoIcon: {
+      width: 24,
+      height: 24,
+    },
+    body: {
+      padding: 12,
+      backgroundColor: '#F2F2F2',
+      minHeight: 82,
+      borderBottomLeftRadius: 20,
+      borderBottomRightRadius: 20,
+    },
+    message: {
+      fontWeight: '400',
+      fontSize: 13,
+      lineHeight: 18,
+      color: '#333333',
+      textAlign: 'justify',
+    },
   },
 });
 
