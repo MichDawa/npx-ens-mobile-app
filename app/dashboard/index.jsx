@@ -13,6 +13,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useDashboardState } from "../../store/state/dashboard-state";
 import { useLoginNavigation } from "../../store/state/login-state";
 import hardwareData from "../../assets/hardware-data";
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Import icons
 const floodIcon = require('../../assets/images/icons/flood.png');
@@ -23,12 +24,15 @@ const mapPinIcon = require('../../assets/images/map-pin.png');
 const warningIcon = require('../../assets/images/icons/flood.png');
 
 // FloodWarning component
-const FloodWarning = ({ data }) => {
+const FloodWarning = ({ data, navigateTo }) => {
   // Find the highest risk area from hardware data
   const highRiskArea = data.find(area => area.sensorValue === "HIGH RISK") || data[0];
   
   return (
-    <View style={styles.floodWarning.container}>
+    <TouchableOpacity 
+      style={styles.floodWarning.container}
+      onPress={() => navigateTo('/flood-warning')}
+    >
       <View style={styles.floodWarning.header}>
         <View style={styles.floodWarning.titleContainer}>
           <Image source={warningIcon} style={styles.floodWarning.warningIcon} />
@@ -44,7 +48,7 @@ const FloodWarning = ({ data }) => {
           Residents should seek shelter at the nearest evacuation center and avoid other flooded areas near you.
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -98,173 +102,184 @@ const WeatherDashboard = () => {
   };
 
   const renderContent = () => (
-    <ScrollView 
-      style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={loading}
-          onRefresh={refreshWeather}
-          colors={['#fff']}
-          tintColor="#fff"
-        />
-      }
+    <LinearGradient
+      colors={['#051B45', '#0B42AB']}
+      style={{ 
+        flex: 1, 
+        borderRadius: 0,
+        marginTop: -10 
+      }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
     >
-      <TouchableOpacity 
-        style={styles.backButton} 
-        onPress={() => navigateTo('/')}
+      <ScrollView 
+        style={[styles.container, { backgroundColor: 'transparent' }]}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={refreshWeather}
+            colors={['#fff']}
+            tintColor="#fff"
+          />
+        }
       >
-        <Text style={styles.backButtonText}>←</Text>
-      </TouchableOpacity>
-      
-      <View style={styles.header}>
-        {loading && !weatherData.location ? (
-          <Text style={styles.locationName}>Loading location...</Text>
-        ) : (
-          <>
-            {weatherData.location.includes(',') ? (
-              <>
-                <Text style={styles.locationName}>{weatherData.location.split(',')[0]},</Text>
-                <Text style={styles.countryName}>{weatherData.location.split(',')[1].trim()}</Text>
-              </>
-            ) : (
-              <Text style={styles.locationName}>{weatherData.location}</Text>
-            )}
-          </>
-        )}
-        <Text style={styles.date}>{weatherData.date}</Text>
-      </View>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => navigateTo('/')}
+        >
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
+        
+        <View style={styles.header}>
+          {loading && !weatherData.location ? (
+            <Text style={styles.locationName}>Loading location...</Text>
+          ) : (
+            <>
+              {weatherData.location.includes(',') ? (
+                <>
+                  <Text style={styles.locationName}>{weatherData.location.split(',')[0]},</Text>
+                  <Text style={styles.countryName}>{weatherData.location.split(',')[1].trim()}</Text>
+                </>
+              ) : (
+                <Text style={styles.locationName}>{weatherData.location}</Text>
+              )}
+            </>
+          )}
+          <Text style={styles.date}>{weatherData.date}</Text>
+        </View>
 
-      <View style={styles.mainWeather}>
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#fff" />
-          </View>
-        ) : (
-          <View style={styles.weatherDisplay}>
-            <View style={styles.weatherIconContainer}>
-              <View style={styles.weatherIconLarge}>
-                {getMainWeatherIcon()}
-              </View>
+        <View style={styles.mainWeather}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#fff" />
             </View>
-            
-            <View style={styles.temperatureContainer}>
-              <View style={styles.tempSection}>
-                <View style={styles.tempContainer}>
-                  <View style={styles.temperatureWrapper}>
-                    <Text style={styles.temperature}>{weatherData.temperature}</Text>
-                    <View style={styles.conditionContainer}>
-                      <Text style={styles.condition}>{weatherData.condition}</Text>
+          ) : (
+            <View style={styles.weatherDisplay}>
+              <View style={styles.weatherIconContainer}>
+                <View style={styles.weatherIconLarge}>
+                  {getMainWeatherIcon()}
+                </View>
+              </View>
+              
+              <View style={styles.temperatureContainer}>
+                <View style={styles.tempSection}>
+                  <View style={styles.tempContainer}>
+                    <View style={styles.temperatureWrapper}>
+                      <Text style={styles.temperature}>{weatherData.temperature}</Text>
+                      <View style={styles.conditionContainer}>
+                        <Text style={styles.condition}>{weatherData.condition}</Text>
+                      </View>
                     </View>
+                    <Text style={styles.degreeSymbol}>°C</Text>
                   </View>
-                  <Text style={styles.degreeSymbol}>°C</Text>
                 </View>
               </View>
             </View>
+          )}
+        </View>
+
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
           </View>
         )}
-      </View>
 
-      {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-        </View>
-      )}
+        <FloodWarning data={hardwareData} navigateTo={navigateTo} />
 
-      <FloodWarning data={hardwareData} />
-
-      {/* Flood Risk Indicator - Updated to match image */}
-      <View style={styles.riskContainer}>
-        <View style={styles.riskIndicator}>
-          <View style={styles.riskTextContainer}>
-            <Image source={floodIcon} style={styles.floodIcon} />
-            <Text style={styles.riskText}>Flood Risk Level</Text>
+        {/* Flood Risk Indicator - Updated to match image */}
+        <View style={styles.riskContainer}>
+          <View style={styles.riskIndicator}>
+            <View style={styles.riskTextContainer}>
+              <Image source={floodIcon} style={styles.floodIcon} />
+              <Text style={styles.riskText}>Flood Risk Level</Text>
+            </View>
+            <Text style={styles.riskLevel}>{weatherData.floodRisk.level}</Text>
           </View>
-          <Text style={styles.riskLevel}>{weatherData.floodRisk.level}</Text>
         </View>
-      </View>
 
-      {/* Weather Statistics - Updated to match image */}
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Image source={rainDropsIcon} style={styles.statIcon} />
-          <Text style={styles.statValue}>{weatherData.stats.humidity}</Text>
+        {/* Weather Statistics - Updated to match image */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Image source={rainDropsIcon} style={styles.statIcon} />
+            <Text style={styles.statValue}>{weatherData.stats.humidity}</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Image source={temperatureIcon} style={styles.statIcon} />
+            <Text style={styles.statValue}>{weatherData.stats.pressure}</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Image source={windIcon} style={styles.statIcon} />
+            <Text style={styles.statValue}>{weatherData.stats.windSpeed}</Text>
+          </View>
         </View>
-        <View style={styles.statItem}>
-          <Image source={temperatureIcon} style={styles.statIcon} />
-          <Text style={styles.statValue}>{weatherData.stats.pressure}</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Image source={windIcon} style={styles.statIcon} />
-          <Text style={styles.statValue}>{weatherData.stats.windSpeed}</Text>
-        </View>
-      </View>
 
-      <View style={styles.hourlyForecastContainer}>
-        <View style={styles.hourlyForecastHeader}>
-          <Text style={styles.hourlyForecastTitle}>Today</Text>
-          <Text style={styles.hourlyForecastDate}>
-            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-          </Text>
-        </View>
-        <View style={styles.hourlyForecastContent}>
-          <View style={styles.hourlyForecastCards}>
-            {weatherData.hourlyForecast.map((hour, index) => {
-              const hourValue = parseInt(hour.time.split('.')[0]);
-              
-              const currentHour = new Date().getHours();
-              
-              let closestHourIndex = 0;
-              let smallestDiff = 24;
-              
-              weatherData.hourlyForecast.forEach((forecast, idx) => {
-                const forecastHour = parseInt(forecast.time.split('.')[0]);
-                let diff = Math.abs(forecastHour - currentHour);
-                if (diff > 12) diff = 24 - diff;
+        <View style={styles.hourlyForecastContainer}>
+          <View style={styles.hourlyForecastHeader}>
+            <Text style={styles.hourlyForecastTitle}>Today</Text>
+            <Text style={styles.hourlyForecastDate}>
+              {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </Text>
+          </View>
+          <View style={styles.hourlyForecastContent}>
+            <View style={styles.hourlyForecastCards}>
+              {weatherData.hourlyForecast.map((hour, index) => {
+                const hourValue = parseInt(hour.time.split('.')[0]);
                 
-                if (diff < smallestDiff) {
-                  smallestDiff = diff;
-                  closestHourIndex = idx;
-                }
-              });
-              
-              const isActive = index === selectedForecastIndex || 
-                (selectedForecastIndex === null && index === closestHourIndex);
-              
-              return (
-                <TouchableOpacity 
-                  key={index} 
-                  style={[
-                    styles.hourlyForecastCard,
-                    isActive && styles.hourlyForecastCardActive
-                  ]}
-                  onPress={() => handleForecastSelect(hour, index)}
-                >
-                  <Text style={styles.hourlyForecastTemp}>{hour.temp}</Text>
-                  <View style={styles.hourlyForecastIconContainer}>
-                    {renderWeatherIcon(hour.icon, 60)}
-                  </View>
-                  <Text style={styles.hourlyForecastTime}>{hour.time}</Text>
-                </TouchableOpacity>
-              );
-            })}
+                const currentHour = new Date().getHours();
+                
+                let closestHourIndex = 0;
+                let smallestDiff = 24;
+                
+                weatherData.hourlyForecast.forEach((forecast, idx) => {
+                  const forecastHour = parseInt(forecast.time.split('.')[0]);
+                  let diff = Math.abs(forecastHour - currentHour);
+                  if (diff > 12) diff = 24 - diff;
+                  
+                  if (diff < smallestDiff) {
+                    smallestDiff = diff;
+                    closestHourIndex = idx;
+                  }
+                });
+                
+                const isActive = index === selectedForecastIndex || 
+                  (selectedForecastIndex === null && index === closestHourIndex);
+                
+                return (
+                  <TouchableOpacity 
+                    key={index} 
+                    style={[
+                      styles.hourlyForecastCard,
+                      isActive && styles.hourlyForecastCardActive
+                    ]}
+                    onPress={() => handleForecastSelect(hour, index)}
+                  >
+                    <Text style={styles.hourlyForecastTemp}>{hour.temp}</Text>
+                    <View style={styles.hourlyForecastIconContainer}>
+                      {renderWeatherIcon(hour.icon, 60)}
+                    </View>
+                    <Text style={styles.hourlyForecastTime}>{hour.time}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
         </View>
-      </View>
 
-      <TouchableOpacity 
-        style={styles.locationButton} 
-        onPress={() => navigateTo({
-          pathname: '/maps-location',
-          params: { 
-            loginFormData
-          }
-        })}
-      >
-        <View style={styles.locationButtonBackground}>
-          <Image source={mapPinIcon} style={styles.locationButtonIcon} />
-        </View>
-      </TouchableOpacity>
-    </ScrollView>
+        <TouchableOpacity 
+          style={styles.locationButton} 
+          onPress={() => navigateTo({
+            pathname: '/maps-location',
+            params: { 
+              loginFormData
+            }
+          })}
+        >
+          <View style={styles.locationButtonBackground}>
+            <Image source={mapPinIcon} style={styles.locationButtonIcon} />
+          </View>
+        </TouchableOpacity>
+      </ScrollView>
+    </LinearGradient>
   );
 
   return (
@@ -276,14 +291,32 @@ const WeatherDashboard = () => {
       />
       {Platform.OS === 'ios' ? (
         <View style={styles.absoluteFill}>
-          <SafeAreaView style={styles.iosContainer}>
-            {renderContent()}
+          <SafeAreaView style={[styles.iosContainer, { backgroundColor: 'transparent' }]}>
+            <LinearGradient
+              colors={['#051B45', '#0B42AB']}
+              style={{ flex: 1, borderRadius: 0 }}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            >
+              {renderContent()}
+            </LinearGradient>
           </SafeAreaView>
         </View>
       ) : (
-        <View style={styles.androidContainer}>
-          {renderContent()}
-        </View>
+        <LinearGradient
+          colors={['#051B45', '#0B42AB']}
+          style={{ 
+            flex: 1, 
+            borderRadius: 0,
+            marginTop: -10 
+          }}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        >
+          <View style={[styles.androidContainer, { backgroundColor: 'transparent' }]}>
+            {renderContent()}
+          </View>
+        </LinearGradient>
       )}
     </>
   );

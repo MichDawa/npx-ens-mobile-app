@@ -34,6 +34,10 @@ const StackNavigator = () => (
       name="dashboard/index"
       options={{ headerShown: false }}
     />
+    <Stack.Screen 
+      name="flood-warning/index"
+      options={{ headerShown: false }}
+    />
   </Stack>
 );
 
